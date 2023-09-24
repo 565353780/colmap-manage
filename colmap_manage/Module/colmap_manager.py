@@ -1,5 +1,4 @@
 import os
-from re import X
 import shutil
 
 from colmap_manage.Config.colmap import COLMAP_PATH
