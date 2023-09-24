@@ -11,7 +11,7 @@ if [! -d "/usr/local/bin/colmap"]; then
 	rm -rf build
 	mkdir build
 	cd build
-	cmake .. -G Ninja
+	cmake .. -DCMAKE_CUDA_ARCHITECTURES=86 -G Ninja
 	ninja
 	sudo ninja install
 fi
