@@ -1,5 +1,3 @@
-import os
-import shutil
 from colmap_manage.Config.dataset import METHOD_DICT
 from colmap_manage.Method.dataset import (
     generateGSDataset,
