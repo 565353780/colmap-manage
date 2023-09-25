@@ -1,5 +1,5 @@
 cd ..
-git clone https://github.com/colmap/colmap
+git clone https://github.com/colmap/colmap.git
 
 sudo apt-get install git cmake ninja-build build-essential libboost-program-options-dev \
 	libboost-filesystem-dev libboost-graph-dev libboost-system-dev libeigen3-dev libflann-dev \
