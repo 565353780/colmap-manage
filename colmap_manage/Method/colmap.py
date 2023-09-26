@@ -1,5 +1,6 @@
 import os
 import shutil
+from colmap_manage.Config.colmap import PRINT_PROGRESS
 from colmap_manage.Method.cmd import runCMD
 from colmap_manage.Method.path import createFileFolder
 
@@ -23,7 +24,7 @@ def featureExtractor(colmap_path,
         ' --ImageReader.camera_model ' + camera_model + \
         ' --SiftExtraction.use_gpu ' + gpu_tag
 
-    result = runCMD(cmd)
+    result = runCMD(cmd, PRINT_PROGRESS)
     if result is None:
         print('[ERROR][colmap::featureExtractor]')
         print('\t runCMD failed!')
@@ -45,7 +46,7 @@ def exhaustiveMatcher(colmap_path,
         ' --database_path ' + data_folder_path + database_path + \
         ' --SiftMatching.use_gpu ' + gpu_tag
 
-    result = runCMD(cmd)
+    result = runCMD(cmd, PRINT_PROGRESS)
     if result is None:
         print('[ERROR][colmap::exhaustiveMatcher]')
         print('\t runCMD failed!')
@@ -71,7 +72,7 @@ def mapper(colmap_path,
         ' --output_path ' + data_folder_path + sparse_path + \
         ' --Mapper.ba_global_function_tolerance=' + str(ba_global_function_tolerance)
 
-    result = runCMD(cmd)
+    result = runCMD(cmd, PRINT_PROGRESS)
     if result is None:
         print('[ERROR][colmap::mapper]')
         print('\t runCMD failed!')
@@ -95,7 +96,7 @@ def imageUndistorer(colmap_path,
         ' --output_path ' + data_folder_path + undistort_path + \
         ' --output_type ' + output_type
 
-    result = runCMD(cmd)
+    result = runCMD(cmd, PRINT_PROGRESS)
     if result is None:
         print('[ERROR][colmap::imageUndistorer]')
         print('\t runCMD failed!')
