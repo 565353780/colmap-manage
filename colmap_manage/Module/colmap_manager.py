@@ -2,6 +2,7 @@ import os
 import shutil
 
 from colmap_manage.Config.colmap import COLMAP_PATH
+from colmap_manage.Method.video import videoToImages
 from colmap_manage.Method.colmap import (
     exhaustiveMatcher,
     featureExtractor,
@@ -13,29 +14,86 @@ from colmap_manage.Method.colmap import (
 class COLMAPManager(object):
     def __init__(self,
                  data_folder_path=None,
+                 video_file_path=None,
+                 down_sample_scale=1,
+                 scale=1,
+                 show_image=False,
+                 print_progress=False,
                  colmap_path=COLMAP_PATH):
-        self.data_folder_path = None
-
         assert os.path.exists(colmap_path)
         self.colmap_path = colmap_path
 
+        self.data_folder_path = None
+        self.video_file_path = None
+        self.down_sample_scale = 1
+        self.scale = 1
+        self.show_image = False
+        self.print_progress = False
+
         if data_folder_path is not None:
-            assert self.loadData(data_folder_path)
+            assert self.loadData(data_folder_path, video_file_path, down_sample_scale,
+                                 scale, show_image, print_progress)
         return
 
-
-    def loadData(self, data_folder_path):
+    def reset(self):
         self.data_folder_path = None
+        self.video_file_path = None
+        self.down_sample_scale = 1
+        self.scale = 1
+        self.show_image = False
+        self.print_progress = False
+        return True
+
+    def loadVideo(self):
+        if self.video_file_path is None:
+            return True
+
+        assert self.video_file_path is not None
+        assert self.data_folder_path is not None
+
+        video_file_name = self.video_file_path.split('/')[-1]
+
+        if os.path.exists(self.data_folder_path + video_file_name):
+            print('[ERROR][COLMAPManager::loadVideo]')
+            print('\t video is located at data_folder!' + \
+                ' please set a new data_folder_path!')
+            self.reset()
+            return False
+
+        if os.path.exists(self.data_folder_path):
+            shutil.rmtree(self.data_folder_path)
+
+        os.makedirs(self.data_folder_path)
+
+        videoToImages(self.video_file_path, self.data_folder_path + 'input/',
+                      self.down_sample_scale, self.scale,self.show_image,
+                      self.print_progress)
+        return True
+
+    def loadData(self, data_folder_path, video_file_path=None, down_sample_scale=1,
+                 scale=1, show_image=False, print_progress=False):
+        self.data_folder_path = data_folder_path
+        self.data_folder_path = data_folder_path
+        self.video_file_path = video_file_path
+        self.down_sample_scale = down_sample_scale
+        self.scale = scale
+        self.show_image = show_image
+        self.print_progress = print_progress
+
+        if self.data_folder_path[-1] != '/':
+            self.data_folder_path += '/'
+
+        if not self.loadVideo():
+            print('[ERROR][COLMAPManager::loadData]')
+            print('\t loadVideo failed!')
+            print('\t video_file_path:', video_file_path)
+            return False
 
         if not os.path.exists(data_folder_path):
             print('[ERROR][COLMAPManager::loadData]')
             print('\t data_folder_path not exist!')
             print('\t data_folder_path:', data_folder_path)
             return False
-
-        self.data_folder_path = data_folder_path
-        if self.data_folder_path[-1] != '/':
-            self.data_folder_path += '/'
 
         if not os.path.exists(self.data_folder_path + 'input/'):
             print('[ERROR][COLMAPManager::loadData]')

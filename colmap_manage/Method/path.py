@@ -1,7 +1,6 @@
 import contextlib
 import os
 
-
 def createFileFolder(file_path):
     file_name = file_path.split("/")[-1]
     file_folder_path = file_path.split("/" + file_name)[0] + "/"
