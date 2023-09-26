@@ -114,3 +114,37 @@ def imageUndistorer(colmap_path,
         target_file_path = data_folder_path + 'sparse/0/' + file_name
         shutil.move(file_path, target_file_path)
     return True
+
+def modelConverter(colmap_path,
+                   data_folder_path,
+                   sparse_path='distorted/sparse/',
+                   undistort_path='',
+                   output_type='TXT'):
+    if data_folder_path[-1] != '/':
+        data_folder_path += '/'
+
+    cmd = colmap_path + ' model_converter' + \
+        ' --input_path ' + data_folder_path + sparse_path + '0/' + \
+        ' --output_path ' + data_folder_path + sparse_path + '0/' + \
+        ' --output_type ' + output_type
+
+    result = runCMD(cmd, PRINT_PROGRESS)
+    if result is None:
+        print('[ERROR][colmap::modelConverter]')
+        print('\t runCMD failed!')
+        print('\t cmd:', cmd)
+        return False
+
+    cmd = colmap_path + ' model_converter' + \
+        ' --input_path ' + data_folder_path + undistort_path + 'sparse/0/' + \
+        ' --output_path ' + data_folder_path + undistort_path + 'sparse/0/' + \
+        ' --output_type ' + output_type
+
+    result = runCMD(cmd, PRINT_PROGRESS)
+    if result is None:
+        print('[ERROR][colmap::modelConverter]')
+        print('\t runCMD failed!')
+        print('\t cmd:', cmd)
+        return False
+
+    return True

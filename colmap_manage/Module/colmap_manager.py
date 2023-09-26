@@ -2,13 +2,14 @@ import os
 import shutil
 
 from colmap_manage.Config.colmap import COLMAP_PATH
-from colmap_manage.Method.video import videoToImages
 from colmap_manage.Method.colmap import (
     exhaustiveMatcher,
     featureExtractor,
     imageUndistorer,
     mapper,
+    modelConverter,
 )
+from colmap_manage.Method.video import videoToImages
 
 
 class COLMAPManager(object):
@@ -46,6 +47,12 @@ class COLMAPManager(object):
 
     def loadVideo(self):
         if self.video_file_path is None:
+            return True
+
+        if not os.path.exists(self.video_file_path):
+            print('[WARN][COLMAPManager::loadVideo]')
+            print('\t video_file not exist! start check images...')
+            print('\t video_file_path:', self.video_file_path)
             return True
 
         assert self.video_file_path is not None
@@ -125,7 +132,6 @@ class COLMAPManager(object):
                      camera_model='PINHOLE',
                      ba_global_function_tolerance=0.000001,
                      undistort_path='',
-                     output_type='COLMAP',
                      use_gpu=True):
         if self.data_folder_path is None:
             print('[ERROR][COLMAPManager::generateData]')
@@ -174,18 +180,32 @@ class COLMAPManager(object):
                 return False
             print('\t mapper finished!')
 
-        print('[INFO][COLMAPManager::generateData]')
-        print('\t start imageUndistorer...')
-        if not imageUndistorer(self.colmap_path,
-                               self.data_folder_path,
-                               image_path,
-                               sparse_path,
-                               undistort_path,
-                               output_type):
-            print('[ERROR][COLMAPManager::generateData]')
-            print('\t imageUndistorer failed!')
-            return False
-        print('\t imageUndistorer finished!')
+        if not os.path.exists(self.data_folder_path + undistort_path + 'sparse/'):
+            print('[INFO][COLMAPManager::generateData]')
+            print('\t start imageUndistorer...')
+            if not imageUndistorer(self.colmap_path,
+                                self.data_folder_path,
+                                image_path,
+                                sparse_path,
+                                undistort_path,
+                                'COLMAP'):
+                print('[ERROR][COLMAPManager::generateData]')
+                print('\t imageUndistorer failed!')
+                return False
+            print('\t imageUndistorer finished!')
+
+        if not os.path.exists(self.data_folder_path + sparse_path + '0/cameras.txt'):
+            print('[INFO][COLMAPManager::generateData]')
+            print('\t start modelConverter...')
+            if not modelConverter(self.colmap_path,
+                                self.data_folder_path,
+                                sparse_path,
+                                undistort_path,
+                                'TXT'):
+                print('[ERROR][COLMAPManager::generateData]')
+                print('\t modelConverter failed!')
+                return False
+            print('\t modelConverter finished!')
 
         return True
 
@@ -198,7 +218,6 @@ class COLMAPManager(object):
                          camera_model='PINHOLE',
                          ba_global_function_tolerance=0.000001,
                          undistort_path='',
-                         output_type='COLMAP',
                          use_gpu=True):
         if remove_old:
             self.removeGeneratedData()
@@ -214,7 +233,7 @@ class COLMAPManager(object):
         while current_image_num < valid_image_num:
             self.generateData(True, database_path, image_path, sparse_path,
                               camera_model, ba_global_function_tolerance,
-                              undistort_path, output_type, use_gpu)
+                              undistort_path, use_gpu)
 
             current_image_num = len(os.listdir(self.data_folder_path + 'images/'))
             current_percentage = int((1.0 * current_image_num / \
