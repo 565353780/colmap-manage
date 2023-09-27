@@ -8,7 +8,7 @@ sudo apt-get install git cmake ninja-build build-essential libboost-program-opti
 
 pip install opencv-python tqdm
 
-if [! -d "/usr/local/bin/colmap"]; then
+if [ ! -f "/usr/local/bin/colmap" ]; then
 	cd colmap
 	rm -rf build
 	mkdir build
