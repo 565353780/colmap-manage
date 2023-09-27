@@ -3,7 +3,7 @@ from colmap_manage.Module.colmap_manager import COLMAPManager
 
 def demo():
     data_folder_path = '/home/chli/chLi/Dataset/NeRF/3vjia_simple/'
-    video_file_path = '/home/chli/chLi/Dataset/NeRF/3vjia_person_2/1.mp4'
+    video_file_path = '/home/chli/chLi/Dataset/NeRF/3vjia_person_2/1.mp41'
     down_sample_scale = 4
     scale = 1
     show_image = False
