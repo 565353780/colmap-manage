@@ -190,6 +190,7 @@ if __name__ == "__main__":
     IMAGE_FOLDER = args.images
     TEXT_FOLDER = args.text
     OUT_PATH = args.out
+    USE_ABS_PATH = bool(args.abs_path)
 
     # Check that we can save the output before we do a lot of work
     try:
@@ -327,7 +328,8 @@ if __name__ == "__main__":
                 # why is this requireing a relitive path while using ^
                 image_rel = os.path.relpath(IMAGE_FOLDER)
                 name = str(f"./{image_rel}/{'_'.join(elems[9:])}")
-                name = os.path.abspath(name)
+                if USE_ABS_PATH:
+                    name = os.path.abspath(name)
                 b = sharpness(name)
                 print(name, "sharpness=",b)
                 image_id = int(elems[0])

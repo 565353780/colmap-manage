@@ -2,6 +2,7 @@ from colmap_manage.Config.dataset import METHOD_DICT
 from colmap_manage.Method.dataset import (
     generateGSDataset,
     generateINGPDataset,
+    generateNS2Dataset,
 )
 
 
@@ -29,6 +30,9 @@ class DatasetManager(object):
             return generateGSDataset(data_folder_path, dataset_folder_path, method_dict)
         if method == 'ingp':
             return generateINGPDataset(data_folder_path, dataset_folder_path,
+                                       method_dict)
+        if method == 'ns2':
+            return generateNS2Dataset(data_folder_path, dataset_folder_path,
                                        method_dict)
 
         print('[ERROR][DatasetManager::generateDataset]')

@@ -29,12 +29,13 @@ def generateGSDataset(data_folder_path, dataset_folder_path='./output/',
 
     return True
 
-def generateTransformData(dataset_folder_path, aabb_scale=8):
+def generateTransformData(dataset_folder_path, aabb_scale=8, abs_path=True):
     cmd = 'python ../colmap-manage/colmap_manage/Method/colmap2nerf.py' + \
         ' --images ' + dataset_folder_path + 'images/' + \
         ' --text ' + dataset_folder_path + 'sparse/0/' + \
         ' --out ' + dataset_folder_path + 'transform.json' + \
-        ' --aabb_scale ' + str(aabb_scale)
+        ' --aabb_scale ' + str(aabb_scale) + \
+        ' --abs_path ' + str(abs_path)
 
     if not runCMD(cmd, PRINT_PROGRESS):
         print('[ERROR][dataset::generateTransformData]')
@@ -64,6 +65,32 @@ def generateINGPDataset(data_folder_path, dataset_folder_path='./output/',
 
     if not generateTransformData(dataset_folder_path + 'ingp/', aabb_scale):
         print('[ERROR][dataset::generateINGPDataset]')
+        print('\t generateTransformData failed!')
+        print('\t dataset:', data_folder_path)
+        return False
+
+    return True
+
+def generateNS2Dataset(data_folder_path, dataset_folder_path='./output/',
+                       method_dict={}):
+    ln_dict = {
+        'images/': 'images',
+        'sparse/': 'sparse',
+    }
+
+    aabb_scale = 8
+    if 'aabb_scale' in method_dict.keys():
+        aabb_scale = int(method_dict['aabb_scale'])
+
+    if not generateDatasetByDict(data_folder_path, dataset_folder_path, 'ns2',
+                                 ln_dict):
+        print('[ERROR][dataset::generateNS2Dataset]')
+        print('\t generateDatasetByDict failed!')
+        print('\t dataset:', data_folder_path)
+        return False
+
+    if not generateTransformData(dataset_folder_path + 'ns2/', aabb_scale, False):
+        print('[ERROR][dataset::generateNS2Dataset]')
         print('\t generateTransformData failed!')
         print('\t dataset:', data_folder_path)
         return False
