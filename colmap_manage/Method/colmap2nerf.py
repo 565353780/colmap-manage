@@ -33,6 +33,7 @@ def parse_args():
     parser.add_argument("--vocab_path", default="", help="Vocabulary tree path.")
     parser.add_argument("--overwrite", action="store_true", help="Do not ask for confirmation for overwriting existing images and COLMAP data.")
     parser.add_argument("--mask_categories", nargs="*", type=str, default=[], help="Object categories that should be masked out from the training images. See `scripts/category2id.json` for supported categories.")
+    parser.add_argument("--abs_path", default=True, help="Whether to use absolute file path in .json file")
     args = parser.parse_args()
     return args
 
@@ -190,7 +191,7 @@ if __name__ == "__main__":
     IMAGE_FOLDER = args.images
     TEXT_FOLDER = args.text
     OUT_PATH = args.out
-    USE_ABS_PATH = bool(args.abs_path)
+    USE_ABS_PATH = bool(int(args.abs_path))
 
     # Check that we can save the output before we do a lot of work
     try:
@@ -328,10 +329,15 @@ if __name__ == "__main__":
                 # why is this requireing a relitive path while using ^
                 image_rel = os.path.relpath(IMAGE_FOLDER)
                 name = str(f"./{image_rel}/{'_'.join(elems[9:])}")
+
+                b = sharpness(name)
+
                 if USE_ABS_PATH:
                     name = os.path.abspath(name)
-                b = sharpness(name)
+                else:
+                    name = str(f"./images/{'_'.join(elems[9:])}")
                 print(name, "sharpness=",b)
+
                 image_id = int(elems[0])
                 qvec = np.array(tuple(map(float, elems[1:5])))
                 tvec = np.array(tuple(map(float, elems[5:8])))

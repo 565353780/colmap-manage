@@ -35,7 +35,7 @@ def generateTransformData(dataset_folder_path, aabb_scale=8, abs_path=True):
         ' --text ' + dataset_folder_path + 'sparse/0/' + \
         ' --out ' + dataset_folder_path + 'transform.json' + \
         ' --aabb_scale ' + str(aabb_scale) + \
-        ' --abs_path ' + str(abs_path)
+        ' --abs_path ' + str(int(abs_path))
 
     if not runCMD(cmd, PRINT_PROGRESS):
         print('[ERROR][dataset::generateTransformData]')
