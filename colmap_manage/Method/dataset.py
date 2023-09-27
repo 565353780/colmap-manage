@@ -14,7 +14,8 @@ def generateDatasetByDict(data_folder_path, dataset_folder_path, method, ln_dict
         os.symlink(data_folder_path + source, method_dataset_folder_path + target)
     return True
 
-def generateGSDataset(data_folder_path, dataset_folder_path='./output/'):
+def generateGSDataset(data_folder_path, dataset_folder_path='./output/',
+                      method_dict={}):
     ln_dict = {
         'images/': 'images',
         'sparse/': 'sparse',
@@ -28,7 +29,7 @@ def generateGSDataset(data_folder_path, dataset_folder_path='./output/'):
 
     return True
 
-def generateTransformData(dataset_folder_path, aabb_scale=16):
+def generateTransformData(dataset_folder_path, aabb_scale=8):
     cmd = 'python ../colmap-manage/colmap_manage/Method/colmap2nerf.py' + \
         ' --images ' + dataset_folder_path + 'images/' + \
         ' --text ' + dataset_folder_path + 'sparse/0/' + \
@@ -43,19 +44,25 @@ def generateTransformData(dataset_folder_path, aabb_scale=16):
 
     return True
 
-def generateINGPDataset(data_folder_path, dataset_folder_path='./output/'):
+def generateINGPDataset(data_folder_path, dataset_folder_path='./output/',
+                        method_dict={}):
     ln_dict = {
         'images/': 'images',
         'sparse/': 'sparse',
     }
 
-    if not generateDatasetByDict(data_folder_path, dataset_folder_path, 'ingp', ln_dict):
+    aabb_scale = 8
+    if 'aabb_scale' in method_dict.keys():
+        aabb_scale = int(method_dict['aabb_scale'])
+
+    if not generateDatasetByDict(data_folder_path, dataset_folder_path, 'ingp',
+                                 ln_dict):
         print('[ERROR][dataset::generateINGPDataset]')
         print('\t generateDatasetByDict failed!')
         print('\t dataset:', data_folder_path)
         return False
 
-    if not generateTransformData(dataset_folder_path + 'ingp/'):
+    if not generateTransformData(dataset_folder_path + 'ingp/', aabb_scale):
         print('[ERROR][dataset::generateINGPDataset]')
         print('\t generateTransformData failed!')
         print('\t dataset:', data_folder_path)

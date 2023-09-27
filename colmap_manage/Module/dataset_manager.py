@@ -9,7 +9,8 @@ class DatasetManager(object):
     def __init__(self):
         return
 
-    def generateDataset(self, method, data_folder_path, dataset_folder_path='./output/'):
+    def generateDataset(self, method, data_folder_path, dataset_folder_path='./output/',
+                        method_dict={}):
         if method not in METHOD_DICT.keys():
             print('[ERROR][DatasetManager::generateDataset]')
             print('\t method not valid!')
@@ -25,9 +26,10 @@ class DatasetManager(object):
         print('[INFO][DatasetManager::generateDataset]')
         print('\t start generate dataset for method [', method_name + ']...')
         if method == 'gs':
-            return generateGSDataset(data_folder_path, dataset_folder_path)
+            return generateGSDataset(data_folder_path, dataset_folder_path, method_dict)
         if method == 'ingp':
-            return generateINGPDataset(data_folder_path, dataset_folder_path)
+            return generateINGPDataset(data_folder_path, dataset_folder_path,
+                                       method_dict)
 
         print('[ERROR][DatasetManager::generateDataset]')
         print('\t method not defined yet! please wait the code update!')
