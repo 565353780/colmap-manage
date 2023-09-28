@@ -89,7 +89,7 @@ def generateNADataset(data_folder_path, dataset_folder_path='./output/',
                         method_dict={}):
     ln_dict = {
         'images/': 'images',
-        'sparse/': 'sparse',
+        'sparse/0/': 'sparse',
     }
 
     scene_type = 'outdoor'
