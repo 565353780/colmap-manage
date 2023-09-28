@@ -7,7 +7,7 @@ def generateINGPJsonData(dataset_folder_path, aabb_scale=8):
         ' --text ' + dataset_folder_path + 'sparse/0/' + \
         ' --out ' + dataset_folder_path + 'transform.json' + \
         ' --aabb_scale ' + str(aabb_scale) + \
-        ' --abs_path ' + str(1)
+        ' --abs_path'
 
     if not runCMD(cmd, PRINT_PROGRESS):
         print('[ERROR][dataset::generateINGPJsonData]')
@@ -22,8 +22,7 @@ def generateNS2JsonData(dataset_folder_path, aabb_scale=8):
         ' --images ' + dataset_folder_path + 'images/' + \
         ' --text ' + dataset_folder_path + 'sparse/0/' + \
         ' --out ' + dataset_folder_path + 'transform.json' + \
-        ' --aabb_scale ' + str(aabb_scale) + \
-        ' --abs_path ' + str(0)
+        ' --aabb_scale ' + str(aabb_scale)
 
     if not runCMD(cmd, PRINT_PROGRESS):
         print('[ERROR][dataset::generateNS2JsonData]')

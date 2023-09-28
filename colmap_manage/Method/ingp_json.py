@@ -33,7 +33,7 @@ def parse_args():
     parser.add_argument("--vocab_path", default="", help="Vocabulary tree path.")
     parser.add_argument("--overwrite", action="store_true", help="Do not ask for confirmation for overwriting existing images and COLMAP data.")
     parser.add_argument("--mask_categories", nargs="*", type=str, default=[], help="Object categories that should be masked out from the training images. See `scripts/category2id.json` for supported categories.")
-    parser.add_argument("--abs_path", default=True, help="Whether to use absolute file path in .json file")
+    parser.add_argument("--abs_path", action="store_true", help="use absolute file path in .json file")
     args = parser.parse_args()
     return args
 
@@ -191,7 +191,7 @@ if __name__ == "__main__":
     IMAGE_FOLDER = args.images
     TEXT_FOLDER = args.text
     OUT_PATH = args.out
-    USE_ABS_PATH = bool(int(args.abs_path))
+    USE_ABS_PATH = args.abs_path
 
     # Check that we can save the output before we do a lot of work
     try:
