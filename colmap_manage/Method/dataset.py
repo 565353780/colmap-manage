@@ -1,7 +1,11 @@
 import os
 import shutil
-from colmap_manage.Config.colmap import PRINT_PROGRESS
-from colmap_manage.Method.cmd import runCMD
+
+from colmap_manage.Method.data_json import (
+    generateINGPJsonData,
+    generateNS2JsonData,
+    generateNAJsonData,
+)
 
 def generateDatasetByDict(data_folder_path, dataset_folder_path, method, ln_dict):
     method_dataset_folder_path = dataset_folder_path + method + '/'
@@ -29,22 +33,6 @@ def generateGSDataset(data_folder_path, dataset_folder_path='./output/',
 
     return True
 
-def generateTransformData(dataset_folder_path, aabb_scale=8, abs_path=True):
-    cmd = 'python ../colmap-manage/colmap_manage/Method/colmap2nerf.py' + \
-        ' --images ' + dataset_folder_path + 'images/' + \
-        ' --text ' + dataset_folder_path + 'sparse/0/' + \
-        ' --out ' + dataset_folder_path + 'transform.json' + \
-        ' --aabb_scale ' + str(aabb_scale) + \
-        ' --abs_path ' + str(int(abs_path))
-
-    if not runCMD(cmd, PRINT_PROGRESS):
-        print('[ERROR][dataset::generateTransformData]')
-        print('\t runCMD failed!')
-        print('\t cmd:', cmd)
-        return False
-
-    return True
-
 def generateINGPDataset(data_folder_path, dataset_folder_path='./output/',
                         method_dict={}):
     ln_dict = {
@@ -63,9 +51,9 @@ def generateINGPDataset(data_folder_path, dataset_folder_path='./output/',
         print('\t dataset:', data_folder_path)
         return False
 
-    if not generateTransformData(dataset_folder_path + 'ingp/', aabb_scale):
+    if not generateINGPJsonData(dataset_folder_path + 'ingp/', aabb_scale):
         print('[ERROR][dataset::generateINGPDataset]')
-        print('\t generateTransformData failed!')
+        print('\t generateINGPJsonData failed!')
         print('\t dataset:', data_folder_path)
         return False
 
@@ -89,9 +77,40 @@ def generateNS2Dataset(data_folder_path, dataset_folder_path='./output/',
         print('\t dataset:', data_folder_path)
         return False
 
-    if not generateTransformData(dataset_folder_path + 'ns2/', aabb_scale, False):
+    if not generateNS2JsonData(dataset_folder_path + 'ns2/', aabb_scale):
         print('[ERROR][dataset::generateNS2Dataset]')
-        print('\t generateTransformData failed!')
+        print('\t generateNS2JsonData failed!')
+        print('\t dataset:', data_folder_path)
+        return False
+
+    return True
+
+def generateNADataset(data_folder_path, dataset_folder_path='./output/',
+                        method_dict={}):
+    ln_dict = {
+        'images/': 'images',
+        'sparse/': 'sparse',
+    }
+
+    scene_type = 'outdoor'
+    if 'scene_type' in method_dict.keys():
+        scene_type = method_dict['scene_type']
+        if scene_type not in ['outdoor', 'indoor', 'object']:
+            print('[ERROR][dataset::generateNADataset]')
+            print('\t scene_type not valid!')
+            print('\t scene_type:', scene_type)
+            return False
+
+    if not generateDatasetByDict(data_folder_path, dataset_folder_path, 'na',
+                                 ln_dict):
+        print('[ERROR][dataset::generateNADataset]')
+        print('\t generateDatasetByDict failed!')
+        print('\t dataset:', data_folder_path)
+        return False
+
+    if not generateNAJsonData(dataset_folder_path + 'na/', scene_type):
+        print('[ERROR][dataset::generateNADataset]')
+        print('\t generateNAJsonData failed!')
         print('\t dataset:', data_folder_path)
         return False
 
