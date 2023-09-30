@@ -1,5 +1,6 @@
 import numpy as np
-from scipy.spatial.transform import Rotation as R
+
+from colmap_manage.Method.rotation import qvec2rotmat, rotmat2qvec
 
 def getCameraMatrix(camera_info_dict):
     fx = camera_info_dict['fx']
@@ -14,9 +15,8 @@ def getCameraMatrix(camera_info_dict):
     ])
 
 def getImageMatrix(image_pose_dict):
-    r = R.from_quat(image_pose_dict['quat'])
     image_matrix = np.zeros((4, 4))
-    image_matrix[:3, :3] = r.as_matrix()
+    image_matrix[:3, :3] = qvec2rotmat(image_pose_dict['quat'])
     image_matrix[:3, 3] = image_pose_dict['pos']
     image_matrix[3, 3] = 1.0
 
