@@ -19,7 +19,7 @@ def generateDatasetByDict(data_folder_path, dataset_folder_path, method, ln_dict
     return True
 
 def generateGSDataset(data_folder_path, dataset_folder_path='./output/',
-                      method_dict={}):
+                      method_dict={}, print_progress=False):
     ln_dict = {
         'images/': 'images',
         'sparse/': 'sparse',
@@ -34,7 +34,7 @@ def generateGSDataset(data_folder_path, dataset_folder_path='./output/',
     return True
 
 def generateINGPDataset(data_folder_path, dataset_folder_path='./output/',
-                        method_dict={}):
+                        method_dict={}, print_progress=False):
     ln_dict = {
         'images/': 'images',
         'sparse/': 'sparse',
@@ -51,7 +51,7 @@ def generateINGPDataset(data_folder_path, dataset_folder_path='./output/',
         print('\t dataset:', data_folder_path)
         return False
 
-    if not generateINGPJsonData(dataset_folder_path + 'ingp/', aabb_scale):
+    if not generateINGPJsonData(dataset_folder_path + 'ingp/', aabb_scale, print_progress):
         print('[ERROR][dataset::generateINGPDataset]')
         print('\t generateINGPJsonData failed!')
         print('\t dataset:', data_folder_path)
@@ -60,7 +60,7 @@ def generateINGPDataset(data_folder_path, dataset_folder_path='./output/',
     return True
 
 def generateNS2Dataset(data_folder_path, dataset_folder_path='./output/',
-                       method_dict={}):
+                       method_dict={}, print_progress=False):
     ln_dict = {
         'images/': 'images',
         'sparse/': 'sparse',
@@ -77,7 +77,7 @@ def generateNS2Dataset(data_folder_path, dataset_folder_path='./output/',
         print('\t dataset:', data_folder_path)
         return False
 
-    if not generateNS2JsonData(dataset_folder_path + 'ns2/', aabb_scale):
+    if not generateNS2JsonData(dataset_folder_path + 'ns2/', aabb_scale, print_progress):
         print('[ERROR][dataset::generateNS2Dataset]')
         print('\t generateNS2JsonData failed!')
         print('\t dataset:', data_folder_path)
@@ -86,7 +86,7 @@ def generateNS2Dataset(data_folder_path, dataset_folder_path='./output/',
     return True
 
 def generateNADataset(data_folder_path, dataset_folder_path='./output/',
-                        method_dict={}):
+                        method_dict={}, print_progress=False):
     ln_dict = {
         'images/': 'images',
         'sparse/0/': 'sparse',
@@ -108,7 +108,7 @@ def generateNADataset(data_folder_path, dataset_folder_path='./output/',
         print('\t dataset:', data_folder_path)
         return False
 
-    if not generateNAJsonData(dataset_folder_path + 'na/', scene_type):
+    if not generateNAJsonData(dataset_folder_path + 'na/', scene_type, print_progress):
         print('[ERROR][dataset::generateNADataset]')
         print('\t generateNAJsonData failed!')
         print('\t dataset:', data_folder_path)

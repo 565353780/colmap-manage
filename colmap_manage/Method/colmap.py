@@ -1,6 +1,5 @@
 import os
 import shutil
-from colmap_manage.Config.colmap import PRINT_PROGRESS
 from colmap_manage.Method.cmd import runCMD
 from colmap_manage.Method.path import createFileFolder
 
@@ -9,7 +8,8 @@ def featureExtractor(colmap_path,
                      database_path='distorted/database.db',
                      image_path='input/',
                      camera_model='PINHOLE',
-                     use_gpu=True):
+                     use_gpu=True,
+                     print_progress=False):
     if data_folder_path[-1] != '/':
         data_folder_path += '/'
 
@@ -24,7 +24,7 @@ def featureExtractor(colmap_path,
         ' --ImageReader.camera_model ' + camera_model + \
         ' --SiftExtraction.use_gpu ' + gpu_tag
 
-    result = runCMD(cmd, PRINT_PROGRESS)
+    result = runCMD(cmd, print_progress)
     if result is None:
         print('[ERROR][colmap::featureExtractor]')
         print('\t runCMD failed!')
@@ -36,7 +36,8 @@ def featureExtractor(colmap_path,
 def exhaustiveMatcher(colmap_path,
                       data_folder_path,
                       database_path='distorted/database.db',
-                      use_gpu=True):
+                      use_gpu=True,
+                      print_progress=False):
     if data_folder_path[-1] != '/':
         data_folder_path += '/'
 
@@ -46,7 +47,7 @@ def exhaustiveMatcher(colmap_path,
         ' --database_path ' + data_folder_path + database_path + \
         ' --SiftMatching.use_gpu ' + gpu_tag
 
-    result = runCMD(cmd, PRINT_PROGRESS)
+    result = runCMD(cmd, print_progress)
     if result is None:
         print('[ERROR][colmap::exhaustiveMatcher]')
         print('\t runCMD failed!')
@@ -60,7 +61,8 @@ def mapper(colmap_path,
            database_path='distorted/database.db',
            image_path='input/',
            sparse_path='distorted/sparse/',
-           ba_global_function_tolerance=0.000001):
+           ba_global_function_tolerance=0.000001,
+           print_progress=False):
     if data_folder_path[-1] != '/':
         data_folder_path += '/'
 
@@ -72,7 +74,7 @@ def mapper(colmap_path,
         ' --output_path ' + data_folder_path + sparse_path + \
         ' --Mapper.ba_global_function_tolerance=' + str(ba_global_function_tolerance)
 
-    result = runCMD(cmd, PRINT_PROGRESS)
+    result = runCMD(cmd, print_progress)
     if result is None:
         print('[ERROR][colmap::mapper]')
         print('\t runCMD failed!')
@@ -86,7 +88,8 @@ def imageUndistorer(colmap_path,
                     image_path='input/',
                     sparse_path='distorted/sparse/',
                     undistort_path='',
-                    output_type='COLMAP'):
+                    output_type='COLMAP',
+                    print_progress=False):
     if data_folder_path[-1] != '/':
         data_folder_path += '/'
 
@@ -96,7 +99,7 @@ def imageUndistorer(colmap_path,
         ' --output_path ' + data_folder_path + undistort_path + \
         ' --output_type ' + output_type
 
-    result = runCMD(cmd, PRINT_PROGRESS)
+    result = runCMD(cmd, print_progress)
     if result is None:
         print('[ERROR][colmap::imageUndistorer]')
         print('\t runCMD failed!')
@@ -119,7 +122,8 @@ def modelConverter(colmap_path,
                    data_folder_path,
                    sparse_path='distorted/sparse/',
                    undistort_path='',
-                   output_type='TXT'):
+                   output_type='TXT',
+                   print_progress=False):
     if data_folder_path[-1] != '/':
         data_folder_path += '/'
 
@@ -128,7 +132,7 @@ def modelConverter(colmap_path,
         ' --output_path ' + data_folder_path + sparse_path + '0/' + \
         ' --output_type ' + output_type
 
-    result = runCMD(cmd, PRINT_PROGRESS)
+    result = runCMD(cmd, print_progress)
     if result is None:
         print('[ERROR][colmap::modelConverter]')
         print('\t runCMD failed!')
@@ -140,7 +144,7 @@ def modelConverter(colmap_path,
         ' --output_path ' + data_folder_path + undistort_path + 'sparse/0/' + \
         ' --output_type ' + output_type
 
-    result = runCMD(cmd, PRINT_PROGRESS)
+    result = runCMD(cmd, print_progress)
     if result is None:
         print('[ERROR][colmap::modelConverter]')
         print('\t runCMD failed!')
