@@ -14,14 +14,16 @@ from colmap_manage.Method.video import videoToImages
 
 
 class COLMAPManager(object):
-    def __init__(self,
-                 data_folder_path=None,
-                 video_file_path=None,
-                 down_sample_scale=1,
-                 scale=1,
-                 show_image=False,
-                 print_progress=False,
-                 colmap_path=COLMAP_PATH):
+    def __init__(
+        self,
+        data_folder_path=None,
+        video_file_path=None,
+        down_sample_scale=1,
+        scale=1,
+        show_image=False,
+        print_progress=False,
+        colmap_path=COLMAP_PATH,
+    ):
         assert os.path.exists(colmap_path)
         self.colmap_path = colmap_path
 
@@ -33,8 +35,14 @@ class COLMAPManager(object):
         self.print_progress = False
 
         if data_folder_path is not None:
-            assert self.loadData(data_folder_path, video_file_path, down_sample_scale,
-                                 scale, show_image, print_progress)
+            assert self.loadData(
+                data_folder_path,
+                video_file_path,
+                down_sample_scale,
+                scale,
+                show_image,
+                print_progress,
+            )
         return
 
     def reset(self):
@@ -51,20 +59,22 @@ class COLMAPManager(object):
             return True
 
         if not os.path.exists(self.video_file_path):
-            print('[WARN][COLMAPManager::loadVideo]')
-            print('\t video_file not exist! start check images...')
-            print('\t video_file_path:', self.video_file_path)
+            print("[WARN][COLMAPManager::loadVideo]")
+            print("\t video_file not exist! start check images...")
+            print("\t video_file_path:", self.video_file_path)
             return True
 
         assert self.video_file_path is not None
         assert self.data_folder_path is not None
 
-        video_file_name = self.video_file_path.split('/')[-1]
+        video_file_name = self.video_file_path.split("/")[-1]
 
         if os.path.exists(self.data_folder_path + video_file_name):
-            print('[ERROR][COLMAPManager::loadVideo]')
-            print('\t video is located at data_folder!' + \
-                ' please set a new data_folder_path!')
+            print("[ERROR][COLMAPManager::loadVideo]")
+            print(
+                "\t video is located at data_folder!"
+                + " please set a new data_folder_path!"
+            )
             self.reset()
             return False
 
@@ -73,13 +83,25 @@ class COLMAPManager(object):
 
         os.makedirs(self.data_folder_path)
 
-        videoToImages(self.video_file_path, self.data_folder_path + 'input/',
-                      self.down_sample_scale, self.scale,self.show_image,
-                      self.print_progress)
+        videoToImages(
+            self.video_file_path,
+            self.data_folder_path + "input/",
+            self.down_sample_scale,
+            self.scale,
+            self.show_image,
+            self.print_progress,
+        )
         return True
 
-    def loadData(self, data_folder_path, video_file_path=None, down_sample_scale=1,
-                 scale=1, show_image=False, print_progress=False):
+    def loadData(
+        self,
+        data_folder_path,
+        video_file_path=None,
+        down_sample_scale=1,
+        scale=1,
+        show_image=False,
+        print_progress=False,
+    ):
         self.data_folder_path = data_folder_path
         self.data_folder_path = data_folder_path
         self.video_file_path = video_file_path
@@ -88,25 +110,25 @@ class COLMAPManager(object):
         self.show_image = show_image
         self.print_progress = print_progress
 
-        if self.data_folder_path[-1] != '/':
-            self.data_folder_path += '/'
+        if self.data_folder_path[-1] != "/":
+            self.data_folder_path += "/"
 
         if not self.loadVideo():
-            print('[ERROR][COLMAPManager::loadData]')
-            print('\t loadVideo failed!')
-            print('\t video_file_path:', video_file_path)
+            print("[ERROR][COLMAPManager::loadData]")
+            print("\t loadVideo failed!")
+            print("\t video_file_path:", video_file_path)
             return False
 
         if not os.path.exists(data_folder_path):
-            print('[ERROR][COLMAPManager::loadData]')
-            print('\t data_folder_path not exist!')
-            print('\t data_folder_path:', data_folder_path)
+            print("[ERROR][COLMAPManager::loadData]")
+            print("\t data_folder_path not exist!")
+            print("\t data_folder_path:", data_folder_path)
             return False
 
-        if not os.path.exists(self.data_folder_path + 'input/'):
-            print('[ERROR][COLMAPManager::loadData]')
-            print('\t input subfolder not exist!')
-            print('\t input subfolder path:', self.data_folder_path + 'input/')
+        if not os.path.exists(self.data_folder_path + "input/"):
+            print("[ERROR][COLMAPManager::loadData]")
+            print("\t input subfolder not exist!")
+            print("\t input subfolder path:", self.data_folder_path + "input/")
             self.data_folder_path = None
             return False
 
@@ -117,11 +139,11 @@ class COLMAPManager(object):
         for dir in dir_list:
             dir_path = self.data_folder_path + dir
             if os.path.isdir(dir_path):
-                if dir == 'input':
+                if dir == "input":
                     continue
 
                 if remain_db:
-                    if dir == 'distorted':
+                    if dir == "distorted":
                         continue
 
                 shutil.rmtree(dir_path)
@@ -131,120 +153,137 @@ class COLMAPManager(object):
         if not remain_db:
             return True
 
-        sub_folder_path = self.data_folder_path + 'distorted/'
+        sub_folder_path = self.data_folder_path + "distorted/"
+        if not os.path.exists(sub_folder_path):
+            return True
+
         sub_dir_list = os.listdir(sub_folder_path)
         for dir in sub_dir_list:
             dir_path = sub_folder_path + dir
             if os.path.isdir(dir_path):
                 shutil.rmtree(dir_path)
             else:
-                if dir[-3:] == '.db':
+                if dir[-3:] == ".db":
                     continue
                 os.remove(dir_path)
         return True
 
-    def generateData(self,
-                     remove_old=False,
-                     remain_db=True,
-                     database_path='distorted/database.db',
-                     image_path='input/',
-                     sparse_path='distorted/sparse/',
-                     camera_model='PINHOLE',
-                     ba_global_function_tolerance=0.000001,
-                     undistort_path='',
-                     use_gpu=True):
+    def generateData(
+        self,
+        remove_old=False,
+        remain_db=True,
+        database_path="distorted/database.db",
+        image_path="input/",
+        sparse_path="distorted/sparse/",
+        camera_model="PINHOLE",
+        ba_global_function_tolerance=0.000001,
+        undistort_path="",
+        use_gpu=True,
+    ):
         if self.data_folder_path is None:
-            print('[ERROR][COLMAPManager::generateData]')
-            print('\t data_folder_path is None!')
+            print("[ERROR][COLMAPManager::generateData]")
+            print("\t data_folder_path is None!")
             return False
 
         if remove_old:
             self.removeGeneratedData(remain_db)
 
         if not os.path.exists(self.data_folder_path + database_path):
-            print('[INFO][COLMAPManager::generateData]')
-            print('\t start featureExtractor...')
-            if not featureExtractor(self.colmap_path,
-                                    self.data_folder_path,
-                                    database_path,
-                                    image_path,
-                                    camera_model,
-                                    use_gpu,
-                                    self.print_progress):
-                print('[ERROR][COLMAPManager::generateData]')
-                print('\t featureExtractor failed!')
+            print("[INFO][COLMAPManager::generateData]")
+            print("\t start featureExtractor...")
+            if not featureExtractor(
+                self.colmap_path,
+                self.data_folder_path,
+                database_path,
+                image_path,
+                camera_model,
+                use_gpu,
+                self.print_progress,
+            ):
+                print("[ERROR][COLMAPManager::generateData]")
+                print("\t featureExtractor failed!")
                 return False
-            print('\t featureExtractor finished!')
+            print("\t featureExtractor finished!")
 
-            print('[INFO][COLMAPManager::generateData]')
-            print('\t start exhaustiveMatcher...')
-            if not exhaustiveMatcher(self.colmap_path,
-                                     self.data_folder_path,
-                                     database_path,
-                                     use_gpu,
-                                     self.print_progress):
-                print('[ERROR][COLMAPManager::generateData]')
-                print('\t exhaustiveMatcher failed!')
+            print("[INFO][COLMAPManager::generateData]")
+            print("\t start exhaustiveMatcher...")
+            if not exhaustiveMatcher(
+                self.colmap_path,
+                self.data_folder_path,
+                database_path,
+                use_gpu,
+                self.print_progress,
+            ):
+                print("[ERROR][COLMAPManager::generateData]")
+                print("\t exhaustiveMatcher failed!")
                 return False
-            print('\t exhaustiveMatcher finished!')
+            print("\t exhaustiveMatcher finished!")
 
         if not os.path.exists(self.data_folder_path + sparse_path):
-            print('[INFO][COLMAPManager::generateData]')
-            print('\t start mapper...')
-            if not mapper(self.colmap_path,
-                          self.data_folder_path,
-                          database_path,
-                          image_path,
-                          sparse_path,
-                          ba_global_function_tolerance,
-                          self.print_progress):
-                print('[ERROR][COLMAPManager::generateData]')
-                print('\t mapper failed!')
+            print("[INFO][COLMAPManager::generateData]")
+            print("\t start mapper...")
+            if not mapper(
+                self.colmap_path,
+                self.data_folder_path,
+                database_path,
+                image_path,
+                sparse_path,
+                ba_global_function_tolerance,
+                self.print_progress,
+            ):
+                print("[ERROR][COLMAPManager::generateData]")
+                print("\t mapper failed!")
                 return False
-            print('\t mapper finished!')
+            print("\t mapper finished!")
 
-        if not os.path.exists(self.data_folder_path + undistort_path + 'sparse/'):
-            print('[INFO][COLMAPManager::generateData]')
-            print('\t start imageUndistorer...')
-            if not imageUndistorer(self.colmap_path,
-                                   self.data_folder_path,
-                                   image_path,
-                                   sparse_path,
-                                   undistort_path,
-                                   'COLMAP',
-                                   self.print_progress):
-                print('[ERROR][COLMAPManager::generateData]')
-                print('\t imageUndistorer failed!')
+        if not os.path.exists(self.data_folder_path + undistort_path + "sparse/"):
+            print("[INFO][COLMAPManager::generateData]")
+            print("\t start imageUndistorer...")
+            if not imageUndistorer(
+                self.colmap_path,
+                self.data_folder_path,
+                image_path,
+                sparse_path,
+                undistort_path,
+                "COLMAP",
+                self.print_progress,
+            ):
+                print("[ERROR][COLMAPManager::generateData]")
+                print("\t imageUndistorer failed!")
                 return False
-            print('\t imageUndistorer finished!')
+            print("\t imageUndistorer finished!")
 
-        if not os.path.exists(self.data_folder_path + sparse_path + '0/cameras.txt'):
-            print('[INFO][COLMAPManager::generateData]')
-            print('\t start modelConverter...')
-            if not modelConverter(self.colmap_path,
-                                  self.data_folder_path,
-                                  sparse_path,
-                                  undistort_path,
-                                  'TXT',
-                                  self.print_progress):
-                print('[ERROR][COLMAPManager::generateData]')
-                print('\t modelConverter failed!')
+        if not os.path.exists(self.data_folder_path + sparse_path + "0/cameras.txt"):
+            print("[INFO][COLMAPManager::generateData]")
+            print("\t start modelConverter...")
+            if not modelConverter(
+                self.colmap_path,
+                self.data_folder_path,
+                sparse_path,
+                undistort_path,
+                "TXT",
+                self.print_progress,
+            ):
+                print("[ERROR][COLMAPManager::generateData]")
+                print("\t modelConverter failed!")
                 return False
-            print('\t modelConverter finished!')
+            print("\t modelConverter finished!")
 
         return True
 
-    def autoGenerateData(self,
-                         remove_old=True,
-                         remain_db=True,
-                         valid_percentage=0.8,
-                         database_path='distorted/database.db',
-                         image_path='input/',
-                         sparse_path='distorted/sparse/',
-                         camera_model='PINHOLE',
-                         ba_global_function_tolerance=0.000001,
-                         undistort_path='',
-                         use_gpu=True):
+    def autoGenerateData(
+        self,
+        remove_old=True,
+        remain_db=True,
+        valid_percentage=0.8,
+        database_path="distorted/database.db",
+        image_path="input/",
+        sparse_path="distorted/sparse/",
+        camera_model="PINHOLE",
+        ba_global_function_tolerance=0.000001,
+        undistort_path="",
+        use_gpu=True,
+    ):
         if remove_old:
             self.removeGeneratedData(remain_db)
 
@@ -252,29 +291,44 @@ class COLMAPManager(object):
         valid_image_num = int(valid_percentage * input_image_num)
 
         current_image_num = 0
-        if os.path.exists(self.data_folder_path + 'images/'):
-            current_image_num = len(os.listdir(self.data_folder_path + 'images/'))
+        if os.path.exists(self.data_folder_path + "images/"):
+            current_image_num = len(os.listdir(self.data_folder_path + "images/"))
 
         iter_idx = 0
         percentage_list = []
         while current_image_num < valid_image_num:
-            self.generateData(True, remain_db, database_path, image_path, sparse_path,
-                              camera_model, ba_global_function_tolerance,
-                              undistort_path, use_gpu)
+            self.generateData(
+                True,
+                remain_db,
+                database_path,
+                image_path,
+                sparse_path,
+                camera_model,
+                ba_global_function_tolerance,
+                undistort_path,
+                use_gpu,
+            )
 
-            current_image_num = len(os.listdir(self.data_folder_path + 'images/'))
-            current_percentage = int((1.0 * current_image_num / \
-                input_image_num) * 100)
+            current_image_num = len(os.listdir(self.data_folder_path + "images/"))
+            current_percentage = int((1.0 * current_image_num / input_image_num) * 100)
             iter_idx += 1
-            print('[INFO][COLMAPManager::autoGenerateData]')
-            print('\t finish iteration: [' + str(iter_idx) + '],' + \
-                ' current percentage: ' + str(current_percentage) + '%')
+            print("[INFO][COLMAPManager::autoGenerateData]")
+            print(
+                "\t finish iteration: ["
+                + str(iter_idx)
+                + "],"
+                + " current percentage: "
+                + str(current_percentage)
+                + "%"
+            )
 
             percentage_list.append(current_percentage)
             percentage_list.sort(reverse=True)
 
             if len(percentage_list) > 10:
-                if current_percentage > percentage_list[
-                    int(len(percentage_list) * 0.2)]:
+                if (
+                    current_percentage
+                    > percentage_list[int(len(percentage_list) * 0.2)]
+                ):
                     break
         return True
