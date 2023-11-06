@@ -81,7 +81,29 @@ def generateJNJsonData(dataset_folder_path, aabb_scale=8, print_progress=False):
         + "sparse/0/"
         + " --out "
         + dataset_folder_path
-        + "transform.json"
+        + "transform_train.json"
+        + " --aabb_scale "
+        + str(aabb_scale)
+        + " --abs_path"
+    )
+
+    if not runCMD(cmd, print_progress):
+        print("[ERROR][dataset::generateJNJsonData]")
+        print("\t runCMD failed!")
+        print("\t cmd:", cmd)
+        return False
+
+    cmd = (
+        "python ../colmap-manage/colmap_manage/Method/ingp_json.py"
+        + " --images "
+        + dataset_folder_path
+        + "images/"
+        + " --text "
+        + dataset_folder_path
+        + "sparse/0/"
+        + " --out "
+        + dataset_folder_path
+        + "transform_test.json"
         + " --aabb_scale "
         + str(aabb_scale)
         + " --abs_path"
