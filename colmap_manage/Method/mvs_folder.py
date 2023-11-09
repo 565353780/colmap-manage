@@ -370,7 +370,7 @@ if __name__ == "__main__":
     os.makedirs(renamed_dir, exist_ok=True)
 
     cameras, images, points3d = read_model(model_dir, ".txt")
-    num_images = len(list(images.items()))
+    num_images = len(list(images.keys()))
 
     param_type = {
         "SIMPLE_PINHOLE": ["f", "cx", "cy"],
@@ -443,13 +443,13 @@ if __name__ == "__main__":
 
     # depth range and interval
     depth_ranges = {}
-    for i in range(num_images):
+    for key in images.keys():
         zs = []
-        for p3d_id in images[i + 1].point3D_ids:
+        for p3d_id in images[key].point3D_ids:
             if p3d_id == -1:
                 continue
             transformed = np.matmul(
-                extrinsic[i + 1],
+                extrinsic[key],
                 [
                     points3d[p3d_id].xyz[0],
                     points3d[p3d_id].xyz[1],
@@ -457,15 +457,15 @@ if __name__ == "__main__":
                     1,
                 ],
             )
-            zs.append(np.asscalar(transformed[2]))
+            zs.append(transformed[2].item())
         zs_sorted = sorted(zs)
         # relaxed depth range
         depth_min = zs_sorted[int(len(zs) * 0.01)]
         depth_max = zs_sorted[int(len(zs) * 0.99)]
         # determine depth number by inverse depth setting, see supplementary material
         if args.max_d == 0:
-            image_int = intrinsic[images[i + 1].camera_id]
-            image_ext = extrinsic[i + 1]
+            image_int = intrinsic[images[key].camera_id]
+            image_ext = extrinsic[key]
             image_r = image_ext[0:3, 0:3]
             image_t = image_ext[0:3, 3]
             p1 = [image_int[0, 2], image_int[1, 2], 1]
@@ -480,26 +480,31 @@ if __name__ == "__main__":
         else:
             depth_num = args.max_d
         depth_interval = (depth_max - depth_min) / (depth_num - 1) / args.interval_scale
-        depth_ranges[i + 1] = (depth_min, depth_interval, depth_num, depth_max)
+        depth_ranges[key] = (depth_min, depth_interval, depth_num, depth_max)
     print("depth_ranges[1]\n", depth_ranges[1], end="\n\n")
 
     # view selection
     score = np.zeros((len(images), len(images)))
     queue = []
+    image_keys_list = list(images.keys())
+    image_keys_list.sort()
     for i in range(len(images)):
         for j in range(i + 1, len(images)):
             queue.append((i, j))
 
     def calc_score(inputs):
         i, j = inputs
-        id_i = images[i + 1].point3D_ids
-        id_j = images[j + 1].point3D_ids
+        key_i = image_keys_list[i]
+        key_j = image_keys_list[j]
+
+        id_i = images[key_i].point3D_ids
+        id_j = images[key_j].point3D_ids
         id_intersect = [it for it in id_i if it in id_j]
         cam_center_i = -np.matmul(
-            extrinsic[i + 1][:3, :3].transpose(), extrinsic[i + 1][:3, 3:4]
+            extrinsic[key_i][:3, :3].transpose(), extrinsic[key_i][:3, 3:4]
         )[:, 0]
         cam_center_j = -np.matmul(
-            extrinsic[j + 1][:3, :3].transpose(), extrinsic[j + 1][:3, 3:4]
+            extrinsic[key_j][:3, :3].transpose(), extrinsic[key_j][:3, 3:4]
         )[:, 0]
         score = 0
         for pid in id_intersect:
@@ -534,25 +539,25 @@ if __name__ == "__main__":
         os.makedirs(cam_dir)
     except os.error:
         print(cam_dir + " already exist.")
-    for i in range(num_images):
-        with open(os.path.join(cam_dir, "%08d_cam.txt" % i), "w") as f:
+    for key in images.keys():
+        with open(os.path.join(cam_dir, "%08d_cam.txt" % key), "w") as f:
             f.write("extrinsic\n")
             for j in range(4):
                 for k in range(4):
-                    f.write(str(extrinsic[i + 1][j, k]) + " ")
+                    f.write(str(extrinsic[key][j, k]) + " ")
                 f.write("\n")
             f.write("\nintrinsic\n")
             for j in range(3):
                 for k in range(3):
-                    f.write(str(intrinsic[images[i + 1].camera_id][j, k]) + " ")
+                    f.write(str(intrinsic[images[key].camera_id][j, k]) + " ")
                 f.write("\n")
             f.write(
                 "\n%f %f %f %f\n"
                 % (
-                    depth_ranges[i + 1][0],
-                    depth_ranges[i + 1][1],
-                    depth_ranges[i + 1][2],
-                    depth_ranges[i + 1][3],
+                    depth_ranges[key][0],
+                    depth_ranges[key][1],
+                    depth_ranges[key][2],
+                    depth_ranges[key][3],
                 )
             )
     with open(os.path.join(args.output_folder, "pair.txt"), "w") as f:
@@ -560,14 +565,14 @@ if __name__ == "__main__":
         for i, sorted_score in enumerate(view_sel):
             f.write("%d\n%d " % (i, len(sorted_score)))
             for image_id, s in sorted_score:
-                f.write("%d %f " % (image_id, s))
+                f.write("%d %f " % (image_keys_list[image_id], s))
             f.write("\n")
-    for i in range(num_images):
+    for key in images.keys():
         if args.convert_format:
-            img = cv2.imread(os.path.join(image_dir, images[i + 1].name))
-            cv2.imwrite(os.path.join(renamed_dir, "%08d.jpg" % i), img)
+            img = cv2.imread(os.path.join(image_dir, images[key].name))
+            cv2.imwrite(os.path.join(renamed_dir, "%08d.jpg" % key), img)
         else:
             shutil.copyfile(
-                os.path.join(image_dir, images[i + 1].name),
-                os.path.join(renamed_dir, "%08d.jpg" % i),
+                os.path.join(image_dir, images[key].name),
+                os.path.join(renamed_dir, "%08d.jpg" % key),
             )
