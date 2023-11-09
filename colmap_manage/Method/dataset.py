@@ -10,7 +10,9 @@ from colmap_manage.Method.data_json import (
 from colmap_manage.Method.data_mvs import generateMVSData
 
 
-def generateDatasetByDict(data_folder_path, dataset_folder_path, method, ln_dict):
+def generateDatasetByDict(
+    data_folder_path, dataset_folder_path, method, ln_dict, is_copy=False
+):
     method_dataset_folder_path = dataset_folder_path + method + "/"
 
     if os.path.exists(method_dataset_folder_path):
@@ -18,7 +20,12 @@ def generateDatasetByDict(data_folder_path, dataset_folder_path, method, ln_dict
     os.makedirs(method_dataset_folder_path, exist_ok=True)
 
     for source, target in ln_dict.items():
-        os.symlink(data_folder_path + source, method_dataset_folder_path + target)
+        source_folder_path = data_folder_path + source
+        target_folder_path = method_dataset_folder_path + target
+        if is_copy:
+            shutil.copytree(source_folder_path, target_folder_path)
+        else:
+            os.symlink(source_folder_path, target_folder_path)
     return True
 
 
@@ -26,6 +33,7 @@ def generateGSDataset(
     data_folder_path,
     dataset_folder_path="./output/",
     method_dict={},
+    is_copy=False,
     print_progress=False,
 ):
     ln_dict = {
@@ -33,7 +41,9 @@ def generateGSDataset(
         "sparse/": "sparse",
     }
 
-    if not generateDatasetByDict(data_folder_path, dataset_folder_path, "gs", ln_dict):
+    if not generateDatasetByDict(
+        data_folder_path, dataset_folder_path, "gs", ln_dict, is_copy
+    ):
         print("[ERROR][dataset::generateGSDataset]")
         print("\t generateDatasetByDict failed!")
         print("\t dataset:", data_folder_path)
@@ -46,6 +56,7 @@ def generateINGPDataset(
     data_folder_path,
     dataset_folder_path="./output/",
     method_dict={},
+    is_copy=False,
     print_progress=False,
 ):
     ln_dict = {
@@ -58,7 +69,7 @@ def generateINGPDataset(
         aabb_scale = int(method_dict["aabb_scale"])
 
     if not generateDatasetByDict(
-        data_folder_path, dataset_folder_path, "ingp", ln_dict
+        data_folder_path, dataset_folder_path, "ingp", ln_dict, is_copy
     ):
         print("[ERROR][dataset::generateINGPDataset]")
         print("\t generateDatasetByDict failed!")
@@ -80,6 +91,7 @@ def generateNS2Dataset(
     data_folder_path,
     dataset_folder_path="./output/",
     method_dict={},
+    is_copy=False,
     print_progress=False,
 ):
     ln_dict = {
@@ -91,7 +103,9 @@ def generateNS2Dataset(
     if "aabb_scale" in method_dict.keys():
         aabb_scale = int(method_dict["aabb_scale"])
 
-    if not generateDatasetByDict(data_folder_path, dataset_folder_path, "ns2", ln_dict):
+    if not generateDatasetByDict(
+        data_folder_path, dataset_folder_path, "ns2", ln_dict, is_copy
+    ):
         print("[ERROR][dataset::generateNS2Dataset]")
         print("\t generateDatasetByDict failed!")
         print("\t dataset:", data_folder_path)
@@ -112,6 +126,7 @@ def generateNADataset(
     data_folder_path,
     dataset_folder_path="./output/",
     method_dict={},
+    is_copy=False,
     print_progress=False,
 ):
     ln_dict = {
@@ -128,7 +143,9 @@ def generateNADataset(
             print("\t scene_type:", scene_type)
             return False
 
-    if not generateDatasetByDict(data_folder_path, dataset_folder_path, "na", ln_dict):
+    if not generateDatasetByDict(
+        data_folder_path, dataset_folder_path, "na", ln_dict, is_copy
+    ):
         print("[ERROR][dataset::generateNADataset]")
         print("\t generateDatasetByDict failed!")
         print("\t dataset:", data_folder_path)
@@ -147,6 +164,7 @@ def generateJNDataset(
     data_folder_path,
     dataset_folder_path="./output/",
     method_dict={},
+    is_copy=False,
     print_progress=False,
 ):
     ln_dict = {
@@ -158,7 +176,9 @@ def generateJNDataset(
     if "aabb_scale" in method_dict.keys():
         aabb_scale = int(method_dict["aabb_scale"])
 
-    if not generateDatasetByDict(data_folder_path, dataset_folder_path, "jn", ln_dict):
+    if not generateDatasetByDict(
+        data_folder_path, dataset_folder_path, "jn", ln_dict, is_copy
+    ):
         print("[ERROR][dataset::generateJNDataset]")
         print("\t generateDatasetByDict failed!")
         print("\t dataset:", data_folder_path)
@@ -177,6 +197,7 @@ def generateMVSDataset(
     data_folder_path,
     dataset_folder_path="./output/",
     method_dict={},
+    is_copy=False,
     print_progress=False,
 ):
     ln_dict = {
@@ -192,7 +213,9 @@ def generateMVSDataset(
     if "interval_scale" in method_dict.keys():
         interval_scale = float(method_dict["interval_scale"])
 
-    if not generateDatasetByDict(data_folder_path, dataset_folder_path, "mvs", ln_dict):
+    if not generateDatasetByDict(
+        data_folder_path, dataset_folder_path, "mvs", ln_dict, is_copy
+    ):
         print("[ERROR][dataset::generateMVSDataset]")
         print("\t generateDatasetByDict failed!")
         print("\t dataset:", data_folder_path)
