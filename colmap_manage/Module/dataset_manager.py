@@ -9,6 +9,7 @@ from colmap_manage.Method.dataset import (
     generateNS2Dataset,
     generateNADataset,
     generateJNDataset,
+    generateMVSDataset,
 )
 
 
@@ -80,7 +81,7 @@ class DatasetManager(object):
 
         method_name = METHOD_DICT[method]
         print("[INFO][DatasetManager::generateDataset]")
-        print("\t start generate dataset for method [", method_name + "]...")
+        print("\t start generate dataset for method [" + method_name + "]...")
         if method == "gs":
             return generateGSDataset(
                 data_folder_path, dataset_folder_path, method_dict, print_progress
@@ -99,6 +100,10 @@ class DatasetManager(object):
             )
         if method == "jn":
             return generateJNDataset(
+                data_folder_path, dataset_folder_path, method_dict, print_progress
+            )
+        if method == "mvs":
+            return generateMVSDataset(
                 data_folder_path, dataset_folder_path, method_dict, print_progress
             )
 

@@ -4,4 +4,5 @@ METHOD_DICT = {
     "ns2": "neu-s-2",
     "na": "neural-angelo",
     "jn": "j-nerf",
+    "mvs": "mvs",
 }

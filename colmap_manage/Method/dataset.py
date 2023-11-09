@@ -7,6 +7,7 @@ from colmap_manage.Method.data_json import (
     generateNAJsonData,
     generateJNJsonData,
 )
+from colmap_manage.Method.data_mvs import generateMVSData
 
 
 def generateDatasetByDict(data_folder_path, dataset_folder_path, method, ln_dict):
@@ -166,6 +167,42 @@ def generateJNDataset(
     if not generateJNJsonData(dataset_folder_path + "jn/", aabb_scale, print_progress):
         print("[ERROR][dataset::generateJNDataset]")
         print("\t generateINGPJsonData failed!")
+        print("\t dataset:", data_folder_path)
+        return False
+
+    return True
+
+
+def generateMVSDataset(
+    data_folder_path,
+    dataset_folder_path="./output/",
+    method_dict={},
+    print_progress=False,
+):
+    ln_dict = {
+        "images/": "images",
+        "sparse/0/": "sparse",
+    }
+
+    max_d = 192
+    if "max_d" in method_dict.keys():
+        max_d = int(method_dict["max_d"])
+
+    interval_scale = 1.06
+    if "interval_scale" in method_dict.keys():
+        interval_scale = float(method_dict["interval_scale"])
+
+    if not generateDatasetByDict(data_folder_path, dataset_folder_path, "mvs", ln_dict):
+        print("[ERROR][dataset::generateMVSDataset]")
+        print("\t generateDatasetByDict failed!")
+        print("\t dataset:", data_folder_path)
+        return False
+
+    if not generateMVSData(
+        dataset_folder_path + "mvs/", max_d, interval_scale, print_progress
+    ):
+        print("[ERROR][dataset::generateMVSDataset]")
+        print("\t generateMVSData failed!")
         print("\t dataset:", data_folder_path)
         return False
 
