@@ -563,7 +563,7 @@ if __name__ == "__main__":
     with open(os.path.join(args.output_folder, "pair.txt"), "w") as f:
         f.write("%d\n" % len(images))
         for i, sorted_score in enumerate(view_sel):
-            f.write("%d\n%d " % (i, len(sorted_score)))
+            f.write("%d\n%d " % (image_keys_list[i], len(sorted_score)))
             for image_id, s in sorted_score:
                 f.write("%d %f " % (image_keys_list[image_id], s))
             f.write("\n")
