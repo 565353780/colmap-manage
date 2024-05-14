@@ -18,7 +18,7 @@ class DatasetManager(object):
         return
 
     def generateRGBImage(self, data_folder_path, print_progress=False):
-        images_folder_path = data_folder_path + "images/"
+        images_folder_path = data_folder_path + "dense/images/"
 
         image_file_name_list = os.listdir(images_folder_path)
 
@@ -37,8 +37,8 @@ class DatasetManager(object):
             print("\t channel_num:", channel_num)
             return False
 
-        gray_image_folder_path = data_folder_path + "images_gray/"
-        rgb_image_folder_path = data_folder_path + "images/"
+        gray_image_folder_path = data_folder_path + "dense/images_gray/"
+        rgb_image_folder_path = data_folder_path + "dense/images/"
 
         os.rename(rgb_image_folder_path, gray_image_folder_path)
 

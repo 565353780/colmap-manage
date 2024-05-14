@@ -224,36 +224,21 @@ def stereoFusion(
 
 def modelConverter(colmap_path,
                    data_folder_path,
-                   sparse_path='sparse/',
-                   dense_path='dense/',
+                   bin_path='sparse/0/',
                    output_type='TXT',
                    print_progress=False):
     '''
     Inputs:
-        sparse/0/*.bin
-        dense/sparse/*.bin
+        <bin_path>/*.bin
     Outputs:
-        sparse/0/*.txt
-        dense/sparse/*.txt
+        <bin_path>/*.txt
     '''
     if data_folder_path[-1] != '/':
         data_folder_path += '/'
 
     cmd = colmap_path + ' model_converter' + \
-        ' --input_path ' + data_folder_path + sparse_path + '0/' + \
-        ' --output_path ' + data_folder_path + sparse_path + '0/' + \
-        ' --output_type ' + output_type
-
-    result = runCMD(cmd, print_progress)
-    if result is None:
-        print('[ERROR][colmap::modelConverter]')
-        print('\t runCMD failed!')
-        print('\t cmd:', cmd)
-        return False
-
-    cmd = colmap_path + ' model_converter' + \
-        ' --input_path ' + data_folder_path + dense_path + 'sparse/0/' + \
-        ' --output_path ' + data_folder_path + dense_path + 'sparse/0/' + \
+        ' --input_path ' + data_folder_path + bin_path + \
+        ' --output_path ' + data_folder_path + bin_path + \
         ' --output_type ' + output_type
 
     result = runCMD(cmd, print_progress)

@@ -37,7 +37,7 @@ def generateGSDataset(
     print_progress=False,
 ):
     ln_dict = {
-        "images/": "images",
+        "dense/images/": "images",
         "sparse/": "sparse",
     }
 
@@ -60,7 +60,7 @@ def generateINGPDataset(
     print_progress=False,
 ):
     ln_dict = {
-        "images/": "images",
+        "dense/images/": "images",
         "sparse/": "sparse",
     }
 
@@ -95,7 +95,7 @@ def generateNS2Dataset(
     print_progress=False,
 ):
     ln_dict = {
-        "images/": "images",
+        "dense/images/": "images",
         "sparse/": "sparse",
     }
 
@@ -130,7 +130,7 @@ def generateNADataset(
     print_progress=False,
 ):
     ln_dict = {
-        "images/": "images",
+        "dense/images/": "images",
         "sparse/0/": "sparse",
     }
 
@@ -168,7 +168,7 @@ def generateJNDataset(
     print_progress=False,
 ):
     ln_dict = {
-        "images/": "images",
+        "dense/images/": "images",
         "sparse/": "sparse",
     }
 
@@ -201,7 +201,7 @@ def generateMVSDataset(
     print_progress=False,
 ):
     ln_dict = {
-        "images/": "images",
+        "dense/images/": "images",
         "sparse/0/": "sparse",
     }
 
