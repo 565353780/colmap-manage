@@ -338,8 +338,6 @@ class COLMAPManager(object):
         iter_idx = 0
         percentage_list = []
         while current_image_num < valid_image_num:
-            print("!!!!")
-            exit()
             self.generateData(
                 True,
                 remain_db,
