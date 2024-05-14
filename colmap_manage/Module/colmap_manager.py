@@ -5,8 +5,10 @@ from colmap_manage.Config.colmap import COLMAP_PATH
 from colmap_manage.Method.colmap import (
     exhaustiveMatcher,
     featureExtractor,
-    imageUndistorer,
     mapper,
+    imageUndistorer,
+    patchMatchStereo,
+    stereoFusion,
     modelConverter,
 )
 from colmap_manage.Method.video import videoToImages
@@ -134,6 +136,12 @@ class COLMAPManager(object):
         return True
 
     def removeGeneratedData(self, remain_db=True):
+        if self.data_folder_path is None:
+            print('[WARN][COLMAPManager::removeGeneratedData]')
+            print('\t data folder is None!')
+            print('\t data_folder_path:', self.data_folder_path)
+            return True
+
         dir_list = os.listdir(self.data_folder_path)
         for dir in dir_list:
             dir_path = self.data_folder_path + dir
@@ -141,29 +149,12 @@ class COLMAPManager(object):
                 if dir == "input":
                     continue
 
+                shutil.rmtree(dir_path)
+            else:
                 if remain_db:
-                    if dir == "distorted":
+                    if dir[-3:] == ".db":
                         continue
 
-                shutil.rmtree(dir_path)
-            else:
-                os.remove(dir_path)
-
-        if not remain_db:
-            return True
-
-        sub_folder_path = self.data_folder_path + "distorted/"
-        if not os.path.exists(sub_folder_path):
-            return True
-
-        sub_dir_list = os.listdir(sub_folder_path)
-        for dir in sub_dir_list:
-            dir_path = sub_folder_path + dir
-            if os.path.isdir(dir_path):
-                shutil.rmtree(dir_path)
-            else:
-                if dir[-3:] == ".db":
-                    continue
                 os.remove(dir_path)
         return True
 
@@ -171,17 +162,18 @@ class COLMAPManager(object):
         self,
         remove_old=False,
         remain_db=True,
-        database_path="distorted/database.db",
+        database_path="database.db",
         image_path="input/",
-        sparse_path="distorted/sparse/",
+        sparse_path="sparse/",
+        dense_path="dense/",
         camera_model="PINHOLE",
         ba_global_function_tolerance=0.000001,
-        undistort_path="",
         use_gpu=True,
     ):
         if self.data_folder_path is None:
             print("[ERROR][COLMAPManager::generateData]")
-            print("\t data_folder_path is None!")
+            print("\t data folder is None!")
+            print('\t data_folder_path:', self.data_folder_path)
             return False
 
         if remove_old:
@@ -235,7 +227,7 @@ class COLMAPManager(object):
                 return False
             print("\t mapper finished!")
 
-        if not os.path.exists(self.data_folder_path + undistort_path + "sparse/"):
+        if not os.path.exists(self.data_folder_path + dense_path + "sparse/"):
             print("[INFO][COLMAPManager::generateData]")
             print("\t start imageUndistorer...")
             if not imageUndistorer(
@@ -243,7 +235,7 @@ class COLMAPManager(object):
                 self.data_folder_path,
                 image_path,
                 sparse_path,
-                undistort_path,
+                dense_path,
                 "COLMAP",
                 self.print_progress,
             ):
@@ -252,6 +244,35 @@ class COLMAPManager(object):
                 return False
             print("\t imageUndistorer finished!")
 
+        depth_map_folder_path = self.data_folder_path + dense_path + 'stereo/depth_maps/'
+        if not len(os.listdir(depth_map_folder_path)) == 0:
+            print("[INFO][COLMAPManager::generateData]")
+            print("\t start patchMatchStereo...")
+            if not patchMatchStereo(
+                self.colmap_path,
+                self.data_folder_path,
+                dense_path,
+                self.print_progress,
+            ):
+                print("[ERROR][COLMAPManager::generateData]")
+                print("\t patchMatchStereo failed!")
+                return False
+            print("\t patchMatchStereo finished!")
+
+        if not os.path.exists(self.data_folder_path + dense_path + "result.ply"):
+            print("[INFO][COLMAPManager::generateData]")
+            print("\t start stereoFusion...")
+            if not stereoFusion(
+                self.colmap_path,
+                self.data_folder_path,
+                dense_path,
+                self.print_progress,
+            ):
+                print("[ERROR][COLMAPManager::generateData]")
+                print("\t stereoFusion failed!")
+                return False
+            print("\t stereoFusion finished!")
+
         if not os.path.exists(self.data_folder_path + sparse_path + "0/cameras.txt"):
             print("[INFO][COLMAPManager::generateData]")
             print("\t start modelConverter...")
@@ -259,7 +280,7 @@ class COLMAPManager(object):
                 self.colmap_path,
                 self.data_folder_path,
                 sparse_path,
-                undistort_path,
+                dense_path,
                 "TXT",
                 self.print_progress,
             ):
@@ -268,6 +289,7 @@ class COLMAPManager(object):
                 return False
             print("\t modelConverter finished!")
 
+        exit()
         return True
 
     def autoGenerateData(
@@ -275,23 +297,43 @@ class COLMAPManager(object):
         remove_old=True,
         remain_db=True,
         valid_percentage=0.8,
-        database_path="distorted/database.db",
+        database_path="database.db",
         image_path="input/",
-        sparse_path="distorted/sparse/",
+        sparse_path="sparse/",
+        dense_path="dense/",
         camera_model="PINHOLE",
         ba_global_function_tolerance=0.000001,
-        undistort_path="",
         use_gpu=True,
     ):
+        if self.data_folder_path is None:
+            print('[WARN][COLMAPManager::autoGenerateData]')
+            print('\t data folder is None!')
+            print('\t data_folder_path:', self.data_folder_path)
+            return False
+
         if remove_old:
             self.removeGeneratedData(remain_db)
+
+        self.generateData(
+            False,
+            remain_db,
+            database_path,
+            image_path,
+            sparse_path,
+            dense_path,
+            camera_model,
+            ba_global_function_tolerance,
+            use_gpu,
+        )
+        exit()
 
         input_image_num = len(os.listdir(self.data_folder_path + image_path))
         valid_image_num = int(valid_percentage * input_image_num)
 
         current_image_num = 0
-        if os.path.exists(self.data_folder_path + "images/"):
-            current_image_num = len(os.listdir(self.data_folder_path + "images/"))
+        dense_image_folder_path = self.data_folder_path + dense_path + 'images/'
+        if os.path.exists(dense_image_folder_path):
+            current_image_num = len(os.listdir(dense_image_folder_path))
 
         iter_idx = 0
         percentage_list = []
@@ -302,13 +344,13 @@ class COLMAPManager(object):
                 database_path,
                 image_path,
                 sparse_path,
+                dense_path,
                 camera_model,
                 ba_global_function_tolerance,
-                undistort_path,
                 use_gpu,
             )
 
-            current_image_num = len(os.listdir(self.data_folder_path + "images/"))
+            current_image_num = len(os.listdir(dense_image_folder_path))
             current_percentage = int((1.0 * current_image_num / input_image_num) * 100)
             iter_idx += 1
             print("[INFO][COLMAPManager::autoGenerateData]")

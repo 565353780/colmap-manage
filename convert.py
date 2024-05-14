@@ -1,9 +1,10 @@
 from colmap_manage.Module.colmap_manager import COLMAPManager
 from colmap_manage.Module.dataset_manager import DatasetManager
 
-data_folder_path = "/home/chli/chLi/Dataset/NeRF/3vjia_simple/"
+data_folder_path = "/home/chli/Dataset/NeRF/hotdog_train/"
 video_file_path = "/home/chli/chLi/Dataset/NeRF/3vjia_person_2/1.mp41"
-down_sample_scale = 4
+video_file_path = None
+down_sample_scale = 1
 
 scale = 1
 show_image = False
