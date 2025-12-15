@@ -33,7 +33,7 @@ class COLMAPManager(object):
         self.down_sample_scale = 1
         self.scale = 1
         self.show_image = False
-        self.print_progress = True
+        self.print_progress = False
 
         if data_folder_path is not None:
             assert self.loadData(
