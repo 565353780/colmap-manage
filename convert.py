@@ -1,9 +1,9 @@
 from colmap_manage.Module.colmap_manager import COLMAPManager
 from colmap_manage.Module.dataset_manager import DatasetManager
 
-data_folder_path = "/home/chli/Dataset/NeRF/hotdog_train/"
-video_file_path = "/home/chli/chLi/Dataset/NeRF/3vjia_person_2/1.mp41"
-video_file_path = None
+data_folder_path = "/home/lichanghao/chLi/Dataset/GS/haizei_1/"
+video_file_path = "/home/lichanghao/chLi/Dataset/GS/haizei_1.MOV"
+# video_file_path = None
 down_sample_scale = 1
 
 scale = 1
@@ -13,7 +13,7 @@ remove_old = False
 remain_db = True
 valid_percentage = 0.8
 run_mvs = False
-dataset_folder_path = "../colmap-manage/output/3vjia_simple/"
+dataset_folder_path = "/home/lichanghao/chLi/Dataset/GS/haizei_1/"
 method_name = "gs"
 method_dict = {}
 is_copy = False

@@ -33,7 +33,7 @@ class COLMAPManager(object):
         self.down_sample_scale = 1
         self.scale = 1
         self.show_image = False
-        self.print_progress = False
+        self.print_progress = True
 
         if data_folder_path is not None:
             assert self.loadData(
@@ -203,7 +203,6 @@ class COLMAPManager(object):
                 self.colmap_path,
                 self.data_folder_path,
                 database_path,
-                use_gpu,
                 self.print_progress,
             ):
                 print("[ERROR][COLMAPManager::generateData]")
