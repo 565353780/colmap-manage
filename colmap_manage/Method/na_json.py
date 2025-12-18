@@ -9,6 +9,7 @@ import math
 dir_path = Path(os.path.dirname(os.path.realpath(__file__))).parents[2]
 sys.path.append(dir_path.__str__())
 sys.path.append('../colmap/scripts/python')
+sys.path.append('../colmap-manage')
 
 from colmap_manage.Method.mvs_folder import read_model, qvec2rotmat  # NOQA
 
@@ -206,7 +207,7 @@ if __name__ == "__main__":
     parser.add_argument(
         "--scene_type",
         type=str,
-        default="outdoor",
+        default="object",
         choices=["outdoor", "indoor", "object"],
         help="Select scene type. Outdoor for building-scale reconstruction; "
         "indoor for room-scale reconstruction; object for object-centric scene reconstruction.",
