@@ -17,7 +17,6 @@ for gs_data in gs_list:
     valid_percentage = 0.8
     run_mvs = False
     dataset_folder_path = data_folder_path
-    method_name = "gs"
     method_dict = {}
     is_copy = True
 
