@@ -318,6 +318,8 @@ if __name__ == "__main__":
         up = np.zeros(3)
         for line in f:
             line = line.strip()
+            if len(line) == 0:
+                continue
             if line[0] == "#":
                 continue
             i = i + 1
