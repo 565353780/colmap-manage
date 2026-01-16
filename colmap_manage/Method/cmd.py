@@ -5,7 +5,7 @@ def runCMD(cmd, print_progress=False):
     # 复制当前环境变量，确保继承 conda 环境
     env = os.environ.copy()
     env["LIBGL_ALWAYS_INDIRECT"] = "0"
-    
+
     if not print_progress:
         return check_output(cmd, shell=True, env=env)
 
