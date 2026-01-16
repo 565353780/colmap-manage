@@ -14,6 +14,7 @@ import os
 import argparse
 import shutil
 import cv2
+import trimesh
 
 
 # ============================ read_model.py ============================#
@@ -280,7 +281,10 @@ def read_model(path, ext):
     if ext == ".txt":
         cameras = read_cameras_text(os.path.join(path, "cameras" + ext))
         images = read_images_text(os.path.join(path, "images" + ext))
-        points3D = read_points3D_text(os.path.join(path, "points3D") + ext)
+        #points3D = read_points3D_text(os.path.join(path, "points3D") + ext)
+        points3D_ply_file_path = os.path.join(path, "points3D.ply")
+        ponits3D_mesh = trimesh.load(points3D_ply_file_path)
+        points3D = ponits3D_mesh.vertices
     else:
         cameras = read_cameras_binary(os.path.join(path, "cameras" + ext))
         images = read_images_binary(os.path.join(path, "images" + ext))

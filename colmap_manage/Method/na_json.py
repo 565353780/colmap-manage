@@ -1,10 +1,10 @@
-import numpy as np
-from argparse import ArgumentParser
 import os
 import sys
-from pathlib import Path
 import json
 import math
+import numpy as np
+from pathlib import Path
+from argparse import ArgumentParser
 
 dir_path = Path(os.path.dirname(os.path.realpath(__file__))).parents[2]
 sys.path.append(dir_path.__str__())
@@ -68,7 +68,7 @@ def bound_by_pose(images):
 
 
 def bound_by_points(points3D):
-    xyzs = np.stack([point.xyz for point in points3D.values()])
+    xyzs = points3D
     center = xyzs.mean(axis=0)
     std = xyzs.std(axis=0)
     radius = float(std.max() * 2)  # use 2*std to define the region, equivalent to 95% percentile
@@ -178,7 +178,7 @@ def export_to_json(cameras, images, bounding_box, center, radius, file_path):
 
 
 def data_to_json(args):
-    cameras, images, points3D = read_model(os.path.join(args.data_dir, "sparse"), ext=".bin")
+    cameras, images, points3D = read_model(os.path.join(args.data_dir, "sparse"), ext=".txt")
 
     # define bounding regions based on scene type
     if args.scene_type == "outdoor":
