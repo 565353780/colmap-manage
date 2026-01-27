@@ -15,6 +15,7 @@ import viser.transforms as vtf
 from viser.extras.colmap import (
     read_cameras_text,
     read_images_text,
+    read_points3d_text,
 )
 
 
@@ -35,10 +36,20 @@ class COLMAPRenderer(object):
         # Load the colmap info.
         cameras = read_cameras_text(colmap_path + "cameras.txt")
         images = read_images_text(colmap_path + "images.txt")
-        pcd = o3d.io.read_point_cloud(colmap_path + "points3D.ply")
+        if os.path.exists(colmap_path + "points3D.txt"):
+            points3d = read_points3d_text(colmap_path + "points3D.txt")
 
-        points = np.asarray(pcd.points)
-        colors = np.asarray(pcd.colors)
+            points = np.array([points3d[p_id].xyz for p_id in points3d])
+            colors = np.array([points3d[p_id].rgb for p_id in points3d])
+        elif os.path.exists(colmap_path + "points3D.ply"):
+            pcd = o3d.io.read_point_cloud(colmap_path + "points3D.ply")
+
+            points = np.asarray(pcd.points)
+            colors = np.asarray(pcd.colors)
+        else:
+            print('[ERROR][COLMAPRenderer::main]')
+            print('\t points3D not found!')
+            return False
 
         gui_reset_up = server.gui.add_button(
             "Reset up direction",
