@@ -15,7 +15,7 @@ import viser.transforms as vtf
 from viser.extras.colmap import (
     read_cameras_text,
     read_images_text,
-    read_points3d_text,
+    read_points3d_binary,
 )
 
 
@@ -36,8 +36,8 @@ class COLMAPRenderer(object):
         # Load the colmap info.
         cameras = read_cameras_text(colmap_path + "cameras.txt")
         images = read_images_text(colmap_path + "images.txt")
-        if os.path.exists(colmap_path + "points3D.txt"):
-            points3d = read_points3d_text(colmap_path + "points3D.txt")
+        if os.path.exists(colmap_path + "points3D.bin"):
+            points3d = read_points3d_binary(colmap_path + "points3D.bin")
 
             points = np.array([points3d[p_id].xyz for p_id in points3d])
             colors = np.array([points3d[p_id].rgb for p_id in points3d])
