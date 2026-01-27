@@ -3,13 +3,15 @@ import shutil
 from colmap_manage.Method.cmd import runCMD
 from colmap_manage.Method.path import createFileFolder
 
-def featureExtractor(colmap_path,
-                     data_folder_path,
-                     database_path='database.db',
-                     image_path='input/',
-                     camera_model='PINHOLE',
-                     use_gpu=True,
-                     print_progress=False):
+def featureExtractor(
+    colmap_path: str,
+    data_folder_path: str,
+    database_path: str='database.db',
+    image_path: str='input/',
+    camera_model: str='PINHOLE',
+    use_gpu: bool=False,
+    print_progress: bool=False,
+) -> bool:
     '''
     Inputs:
         input/<images>
@@ -39,10 +41,13 @@ def featureExtractor(colmap_path,
 
     return True
 
-def exhaustiveMatcher(colmap_path,
-                      data_folder_path,
-                      database_path='database.db',
-                      print_progress=False):
+def exhaustiveMatcher(
+    colmap_path: str,
+    data_folder_path: str,
+    database_path: str='database.db',
+    use_gpu: bool=False,
+    print_progress: bool=False
+) -> bool:
     '''
     Inputs:
         database.db
@@ -52,8 +57,11 @@ def exhaustiveMatcher(colmap_path,
     if data_folder_path[-1] != '/':
         data_folder_path += '/'
 
+    gpu_tag = '1' if use_gpu else '0'
+
     cmd = colmap_path + ' exhaustive_matcher' + \
-        ' --database_path ' + data_folder_path + database_path
+        ' --database_path ' + data_folder_path + database_path + \
+        ' --SiftMatching.use_gpu ' + gpu_tag
 
     result = runCMD(cmd, print_progress)
     if result is None:
@@ -69,7 +77,6 @@ def mapper(colmap_path,
            database_path='database.db',
            image_path='input/',
            sparse_path='sparse/',
-           ba_global_function_tolerance=0.000001,
            print_progress=False):
     '''
     Inputs:
@@ -89,8 +96,7 @@ def mapper(colmap_path,
     cmd = colmap_path + ' mapper' + \
         ' --database_path ' + data_folder_path + database_path + \
         ' --image_path ' + data_folder_path + image_path + \
-        ' --output_path ' + data_folder_path + sparse_path + \
-        ' --Mapper.ba_global_function_tolerance=' + str(ba_global_function_tolerance)
+        ' --output_path ' + data_folder_path + sparse_path
 
     result = runCMD(cmd, print_progress)
     if result is None:

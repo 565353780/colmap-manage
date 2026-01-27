@@ -167,7 +167,6 @@ class COLMAPManager(object):
         sparse_path="sparse/",
         dense_path="dense/",
         camera_model="PINHOLE",
-        ba_global_function_tolerance=0.000001,
         use_gpu=False,
         run_mvs: bool = True,
     ):
@@ -203,6 +202,7 @@ class COLMAPManager(object):
                 self.colmap_path,
                 self.data_folder_path,
                 database_path,
+                use_gpu,
                 self.print_progress,
             ):
                 print("[ERROR][COLMAPManager::generateData]")
@@ -219,7 +219,6 @@ class COLMAPManager(object):
                 database_path,
                 image_path,
                 sparse_path,
-                ba_global_function_tolerance,
                 self.print_progress,
             ):
                 print("[ERROR][COLMAPManager::generateData]")
@@ -318,7 +317,6 @@ class COLMAPManager(object):
         sparse_path="sparse/",
         dense_path="dense/",
         camera_model="PINHOLE",
-        ba_global_function_tolerance=0.000001,
         use_gpu=False,
         run_mvs: bool = True,
     ):
@@ -350,7 +348,6 @@ class COLMAPManager(object):
                 sparse_path,
                 dense_path,
                 camera_model,
-                ba_global_function_tolerance,
                 use_gpu,
                 run_mvs,
             )

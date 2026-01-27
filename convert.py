@@ -10,7 +10,7 @@ for gs_data in gs_list:
     data_folder_path = "/home/lichanghao/chLi/Dataset/GS/" + gs_data + "/"
     video_file_path = "/home/lichanghao/chLi/Dataset/GS/" + gs_data + ".MOV"
     #video_file_path = None
-    target_image_num = 100
+    target_image_num = 200
 
     scale = 1
     show_image = False
