@@ -28,7 +28,7 @@ def featureExtractor(colmap_path,
         ' --image_path ' + data_folder_path + image_path + \
         ' --ImageReader.single_camera ' + '1' + \
         ' --ImageReader.camera_model ' + camera_model + \
-        ' --FeatureExtraction.use_gpu ' + gpu_tag
+        ' --SiftExtraction.use_gpu ' + gpu_tag
 
     result = runCMD(cmd, print_progress)
     if result is None:

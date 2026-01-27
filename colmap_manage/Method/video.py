@@ -1,12 +1,14 @@
 import os
 import cv2
 from tqdm import tqdm
+from typing import Optional
 
 
 def videoToImages(
     video_file_path,
     save_image_folder_path,
     down_sample_scale=1,
+    target_image_num: Optional[int]=None,
     scale=1,
     show_image=False,
     print_progress=False,
@@ -20,7 +22,15 @@ def videoToImages(
 
     total_image_num = int(cap.get(7))
 
+    if target_image_num is not None:
+        if target_image_num >= total_image_num:
+            down_sample_scale = 1
+        else:
+            down_sample_scale = int(total_image_num / target_image_num)
+
     for_data = range(total_image_num)
+
+    save_idx = 1
     if print_progress:
         print("[INFO][video::videoToImages]")
         print("\t start convert video to images...")
@@ -45,7 +55,9 @@ def videoToImages(
             cv2.waitKey(1)
 
         save_image_file_path = (
-            save_image_folder_path + "image_" + str(image_idx) + ".png"
+            save_image_folder_path + f"{save_idx:06d}.png"
         )
         cv2.imwrite(save_image_file_path, frame)
+
+        save_idx += 1
     return True

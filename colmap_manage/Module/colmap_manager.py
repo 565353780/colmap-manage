@@ -19,7 +19,7 @@ class COLMAPManager(object):
         self,
         data_folder_path=None,
         video_file_path=None,
-        down_sample_scale=1,
+        target_image_num: int=100,
         scale=1,
         show_image=False,
         print_progress=False,
@@ -30,7 +30,7 @@ class COLMAPManager(object):
 
         self.data_folder_path = None
         self.video_file_path = None
-        self.down_sample_scale = 1
+        self.target_image_num = 100
         self.scale = 1
         self.show_image = False
         self.print_progress = False
@@ -39,7 +39,7 @@ class COLMAPManager(object):
             assert self.loadData(
                 data_folder_path,
                 video_file_path,
-                down_sample_scale,
+                target_image_num,
                 scale,
                 show_image,
                 print_progress,
@@ -49,7 +49,7 @@ class COLMAPManager(object):
     def reset(self):
         self.data_folder_path = None
         self.video_file_path = None
-        self.down_sample_scale = 1
+        self.target_image_num = 100
         self.scale = 1
         self.show_image = False
         self.print_progress = False
@@ -87,10 +87,10 @@ class COLMAPManager(object):
         videoToImages(
             self.video_file_path,
             self.data_folder_path + "input/",
-            self.down_sample_scale,
-            self.scale,
-            self.show_image,
-            self.print_progress,
+            target_image_num=self.target_image_num,
+            scale=self.scale,
+            show_image=self.show_image,
+            print_progress=self.print_progress,
         )
         return True
 
@@ -98,7 +98,7 @@ class COLMAPManager(object):
         self,
         data_folder_path,
         video_file_path=None,
-        down_sample_scale=1,
+        target_image_num: int=100,
         scale=1,
         show_image=False,
         print_progress=False,
@@ -106,7 +106,7 @@ class COLMAPManager(object):
         self.data_folder_path = data_folder_path
         self.data_folder_path = data_folder_path
         self.video_file_path = video_file_path
-        self.down_sample_scale = down_sample_scale
+        self.target_image_num = target_image_num
         self.scale = scale
         self.show_image = show_image
         self.print_progress = print_progress
@@ -168,7 +168,7 @@ class COLMAPManager(object):
         dense_path="dense/",
         camera_model="PINHOLE",
         ba_global_function_tolerance=0.000001,
-        use_gpu=True,
+        use_gpu=False,
         run_mvs: bool = True,
     ):
         if self.data_folder_path is None:
@@ -319,7 +319,7 @@ class COLMAPManager(object):
         dense_path="dense/",
         camera_model="PINHOLE",
         ba_global_function_tolerance=0.000001,
-        use_gpu=True,
+        use_gpu=False,
         run_mvs: bool = True,
     ):
         if self.data_folder_path is None:
