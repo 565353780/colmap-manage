@@ -30,7 +30,7 @@ def featureExtractor(
         ' --image_path ' + data_folder_path + image_path + \
         ' --ImageReader.single_camera ' + '1' + \
         ' --ImageReader.camera_model ' + camera_model + \
-        ' --SiftExtraction.use_gpu ' + gpu_tag
+        ' --FeatureExtraction.use_gpu ' + gpu_tag
 
     result = runCMD(cmd, print_progress)
     if result is None:
@@ -61,7 +61,7 @@ def exhaustiveMatcher(
 
     cmd = colmap_path + ' exhaustive_matcher' + \
         ' --database_path ' + data_folder_path + database_path + \
-        ' --SiftMatching.use_gpu ' + gpu_tag
+        ' --FeatureMatching.use_gpu ' + gpu_tag
 
     result = runCMD(cmd, print_progress)
     if result is None:
