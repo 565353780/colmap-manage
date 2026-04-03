@@ -24,19 +24,41 @@ def _is_hdr_video(video_file_path: str) -> bool:
         return False
 
 
-def _tonemap_video(video_file_path: str, output_path: str) -> str:
-    """用 ffmpeg 将 HDR 视频 tone map 为 SDR，返回输出文件路径。"""
-    cmd = [
-        "ffmpeg", "-y", "-i", video_file_path,
-        "-vf",
-        "zscale=t=linear:npl=100,format=gbrpf32le,"
-        "zscale=p=bt709,tonemap=hable:desat=0,"
-        "zscale=t=bt709:m=bt709:r=tv,format=yuv420p",
-        "-c:v", "libx264", "-crf", "18", "-preset", "fast",
-        "-an", output_path,
+def _tonemap_video(video_file_path: str, output_path: str) -> None:
+    """用 ffmpeg 将 HDR 视频 tone map 为 SDR。
+
+    优先使用 zscale+tonemap（需要 libzimg），
+    若不可用则 fallback 到 colorspace 滤镜（ffmpeg 内置）。
+    """
+    pipelines = [
+        (
+            "zscale=t=linear:npl=100,format=gbrpf32le,"
+            "zscale=p=bt709,tonemap=hable:desat=0,"
+            "zscale=t=bt709:m=bt709:r=tv,format=yuv420p"
+        ),
+        (
+            "colorspace=bt709:iall=bt2020:fast=1,format=yuv420p"
+        ),
     ]
-    subprocess.run(cmd, check=True, capture_output=True)
-    return output_path
+
+    for i, vf in enumerate(pipelines):
+        cmd = [
+            "ffmpeg", "-y", "-i", video_file_path,
+            "-vf", vf,
+            "-c:v", "libx264", "-crf", "18", "-preset", "fast",
+            "-an", output_path,
+        ]
+        result = subprocess.run(cmd, capture_output=True, text=True)
+        if result.returncode == 0:
+            print(f"[INFO][video::_tonemap_video]")
+            print(f"\t tone mapping succeeded with pipeline {i + 1}: {vf}")
+            return
+
+    raise RuntimeError(
+        f"[ERROR][video::_tonemap_video]\n"
+        f"\t all tonemap pipelines failed for: {video_file_path}\n"
+        f"\t last ffmpeg stderr:\n{result.stderr}"
+    )
 
 
 def _save_worker(save_queue: queue.Queue, save_folder_path: str) -> None:
