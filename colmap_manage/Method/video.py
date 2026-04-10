@@ -108,11 +108,17 @@ def videoToImages(
 
     total_image_num = int(cap.get(7))
 
-    if target_image_num is not None:
-        if target_image_num >= total_image_num:
-            down_sample_scale = 1
+    if target_image_num is not None and target_image_num < total_image_num:
+        # 始终包含第一帧(索引0)，然后均匀间隔抽取，共 target_image_num 帧
+        if target_image_num <= 1:
+            selected_indices = {0}
         else:
-            down_sample_scale = int(total_image_num / target_image_num)
+            selected_indices = set(
+                round(i * (total_image_num - 1) / (target_image_num - 1))
+                for i in range(target_image_num)
+            )
+    else:
+        selected_indices = None
 
     for_data = range(total_image_num)
 
@@ -136,9 +142,10 @@ def videoToImages(
             if not status:
                 break
 
-            image_idx += 1
-
-            if image_idx % down_sample_scale != 0:
+            if selected_indices is not None:
+                if image_idx not in selected_indices:
+                    continue
+            elif (image_idx + 1) % down_sample_scale != 0:
                 continue
 
             if scale != 1:
