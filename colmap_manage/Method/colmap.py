@@ -3,6 +3,31 @@ import shutil
 from colmap_manage.Method.cmd import runCMD
 from colmap_manage.Method.path import createFileFolder
 
+
+def getColmapGPUIndex():
+    '''
+    根据 CUDA_VISIBLE_DEVICES 环境变量返回 colmap 可使用的 gpu_index 字符串。
+
+    Returns:
+        - None: 环境变量未设置，colmap 按默认逻辑使用全部可见 GPU
+        - '-1': 环境变量为空字符串，表示不使用 GPU
+        - '0' / '0,1,...': 环境变量重映射后的 GPU 索引列表
+    '''
+    if 'CUDA_VISIBLE_DEVICES' not in os.environ:
+        return None
+
+    cuda_visible = os.environ['CUDA_VISIBLE_DEVICES'].strip()
+    if cuda_visible == '':
+        return '-1'
+
+    gpu_list = [g.strip() for g in cuda_visible.split(',') if g.strip() != '']
+    if len(gpu_list) == 0:
+        return '-1'
+
+    # CUDA_VISIBLE_DEVICES 会对子进程重映射 GPU 索引，从 0 开始连续编号
+    return ','.join(str(i) for i in range(len(gpu_list)))
+
+
 def featureExtractor(
     colmap_path: str,
     data_folder_path: str,
@@ -23,6 +48,9 @@ def featureExtractor(
 
     createFileFolder(data_folder_path + database_path)
 
+    gpu_index = getColmapGPUIndex()
+    if gpu_index == '-1':
+        use_gpu = False
     gpu_tag = '1' if use_gpu else '0'
 
     cmd = colmap_path + ' feature_extractor' + \
@@ -31,6 +59,9 @@ def featureExtractor(
         ' --ImageReader.single_camera ' + '1' + \
         ' --ImageReader.camera_model ' + camera_model + \
         ' --FeatureExtraction.use_gpu ' + gpu_tag
+
+    if use_gpu and gpu_index is not None:
+        cmd += ' --FeatureExtraction.gpu_index ' + gpu_index
 
     result = runCMD(cmd, print_progress)
     if result is None:
@@ -57,11 +88,17 @@ def exhaustiveMatcher(
     if data_folder_path[-1] != '/':
         data_folder_path += '/'
 
+    gpu_index = getColmapGPUIndex()
+    if gpu_index == '-1':
+        use_gpu = False
     gpu_tag = '1' if use_gpu else '0'
 
     cmd = colmap_path + ' exhaustive_matcher' + \
         ' --database_path ' + data_folder_path + database_path + \
         ' --FeatureMatching.use_gpu ' + gpu_tag
+
+    if use_gpu and gpu_index is not None:
+        cmd += ' --FeatureMatching.gpu_index ' + gpu_index
 
     result = runCMD(cmd, print_progress)
     if result is None:
@@ -178,10 +215,15 @@ def patchMatchStereo(
     if data_folder_path[-1] != '/':
         data_folder_path += '/'
 
+    gpu_index = getColmapGPUIndex()
+
     cmd = colmap_path + ' patch_match_stereo' + \
         ' --workspace_path ' + data_folder_path + dense_path + \
         ' --workspace_format ' + 'COLMAP' + \
         ' --PatchMatchStereo.geom_consistency ' + 'true'
+
+    if gpu_index is not None:
+        cmd += ' --PatchMatchStereo.gpu_index ' + gpu_index
 
     result = runCMD(cmd, print_progress)
     if result is None:
