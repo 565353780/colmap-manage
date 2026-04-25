@@ -329,6 +329,22 @@ class COLMAPManager(object):
         if remove_old:
             self.removeGeneratedData(remain_db)
 
+        # valid_percentage<=0 表示不强制对齐比例阈值：跑一次 generateData，
+        # 不管 colmap 实际对齐了多少图片，都视为成功。注意 remove_old 已在
+        # 上面按参数处理过，这里传 False 让 generateData 走断点续跑。
+        if valid_percentage <= 0.0:
+            return self.generateData(
+                False,
+                remain_db,
+                database_path,
+                image_path,
+                sparse_path,
+                dense_path,
+                camera_model,
+                use_gpu,
+                run_mvs,
+            )
+
         input_image_num = len(os.listdir(self.data_folder_path + image_path))
         valid_image_num = int(valid_percentage * input_image_num)
 
