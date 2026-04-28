@@ -69,7 +69,7 @@ def _save_worker(save_queue: queue.Queue, save_folder_path: str) -> None:
             save_queue.task_done()
             break
         save_idx, frame = item
-        path = save_folder_path + f"{save_idx:06d}.png"
+        path = save_folder_path + f"{save_idx:06d}.jpg"
         cv2.imwrite(path, frame)
         save_queue.task_done()
 
