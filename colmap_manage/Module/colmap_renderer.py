@@ -13,9 +13,12 @@ from functools import partial
 import viser
 import viser.transforms as vtf
 from viser.extras.colmap import (
+    read_cameras_binary,
     read_cameras_text,
+    read_images_binary,
     read_images_text,
     read_points3d_binary,
+    read_points3D_text,
 )
 
 
@@ -34,18 +37,41 @@ class COLMAPRenderer(object):
         server.gui.configure_theme(titlebar_content=None, control_layout="collapsible")
 
         # Load the colmap info.
-        cameras = read_cameras_text(colmap_path + "cameras.txt")
-        images = read_images_text(colmap_path + "images.txt")
-        if os.path.exists(colmap_path + "points3D.bin"):
-            points3d = read_points3d_binary(colmap_path + "points3D.bin")
+        # Check for cameras file: prefer binary, fallback to text.
+        if os.path.exists(colmap_path + "cameras.bin"):
+            cameras = read_cameras_binary(colmap_path + "cameras.bin")
+        elif os.path.exists(colmap_path + "cameras.txt"):
+            cameras = read_cameras_text(colmap_path + "cameras.txt")
+        else:
+            print('[ERROR][COLMAPRenderer::main]')
+            print('\t cameras file not found!')
+            return False
 
-            points = np.array([points3d[p_id].xyz for p_id in points3d])
-            colors = np.array([points3d[p_id].rgb for p_id in points3d])
-        elif os.path.exists(colmap_path + "points3D.ply"):
+        # Check for images file: prefer binary, fallback to text.
+        if os.path.exists(colmap_path + "images.bin"):
+            images = read_images_binary(colmap_path + "images.bin")
+        elif os.path.exists(colmap_path + "images.txt"):
+            images = read_images_text(colmap_path + "images.txt")
+        else:
+            print('[ERROR][COLMAPRenderer::main]')
+            print('\t images file not found!')
+            return False
+
+        if os.path.exists(colmap_path + "points3D.ply"):
             pcd = o3d.io.read_point_cloud(colmap_path + "points3D.ply")
 
             points = np.asarray(pcd.points)
             colors = np.asarray(pcd.colors)
+        elif os.path.exists(colmap_path + "points3D.bin"):
+            points3d = read_points3d_binary(colmap_path + "points3D.bin")
+
+            points = np.array([points3d[p_id].xyz for p_id in points3d])
+            colors = np.array([points3d[p_id].rgb for p_id in points3d])
+        elif os.path.exists(colmap_path + "points3D.txt"):
+            points3d = read_points3D_text(colmap_path + "points3D.txt")
+
+            points = np.array([points3d[p_id].xyz for p_id in points3d])
+            colors = np.array([points3d[p_id].rgb for p_id in points3d])
         else:
             print('[ERROR][COLMAPRenderer::main]')
             print('\t points3D not found!')
