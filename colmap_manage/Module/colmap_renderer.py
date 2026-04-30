@@ -160,12 +160,17 @@ class COLMAPRenderer(object):
                 )
                 frames.append(frame)
 
-                # For pinhole cameras, cam.params will be (fx, fy, cx, cy).
-                if cam.model != "PINHOLE":
-                    print(f"Expected pinhole camera, but got {cam.model}")
-
+                # COLMAP camera models put the focal length(s) at the front of
+                # `cam.params`. PINHOLE/OPENCV-style models store (fx, fy, cx, cy, ...),
+                # while SIMPLE_PINHOLE/SIMPLE_RADIAL/RADIAL store (f, cx, cy, ...).
                 H, W = cam.height, cam.width
-                fy = cam.params[1]
+                if cam.model in ("PINHOLE", "OPENCV", "OPENCV_FISHEYE", "FULL_OPENCV", "THIN_PRISM_FISHEYE"):
+                    fy = cam.params[1]
+                elif cam.model in ("SIMPLE_PINHOLE", "SIMPLE_RADIAL", "RADIAL", "SIMPLE_RADIAL_FISHEYE", "RADIAL_FISHEYE"):
+                    fy = cam.params[0]
+                else:
+                    print(f"Unsupported camera model {cam.model}, falling back to params[0]")
+                    fy = cam.params[0]
                 image = iio.imread(image_filename)
                 image = image[::downsample_factor, ::downsample_factor]
                 frustum = server.scene.add_camera_frustum(
