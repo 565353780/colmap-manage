@@ -63,14 +63,15 @@ def _tonemap_video(video_file_path: str, output_path: str) -> None:
 
 def _save_worker(save_queue: queue.Queue, save_folder_path: str) -> None:
     """工作线程：从队列取帧并保存到磁盘。"""
+    write_params = [cv2.IMWRITE_PNG_COMPRESSION, 0]
     while True:
         item = save_queue.get()
         if item is None:
             save_queue.task_done()
             break
         save_idx, frame = item
-        path = save_folder_path + f"{save_idx:06d}.jpg"
-        cv2.imwrite(path, frame)
+        path = save_folder_path + f"{save_idx:06d}.png"
+        cv2.imwrite(path, frame, write_params)
         save_queue.task_done()
 
 
